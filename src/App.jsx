@@ -385,8 +385,8 @@ function App() {
 
       <aside className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
-          <h2>我的收藏夹</h2>
-          <p>精心整理的网站分类导航</p>
+          <h2>Eclair Collection</h2>
+          <p>想想你为什么活着</p>
         </div>
         
         <div className="search-bar">
