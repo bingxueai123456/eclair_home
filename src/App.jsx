@@ -86,7 +86,7 @@ const initialLinks = [
   {
     id: 8,
     title: 'FNJ',
-    url: 'https://service.phoeniciatech.cn/',
+    url: 'https://service.phoeniciatech.cn/new/',
     mainCategory: '友商',
     subCategory: '换电柜',
     description: 'FNJ',
