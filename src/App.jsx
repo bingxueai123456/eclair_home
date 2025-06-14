@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
-  faCode, faTools, faBook, faGamepad, 
-  faMusic, faVideo, faStar, faSearch,
+  faBook, faGamepad, 
+   faStar, faSearch,
   faChevronDown, faChevronRight, faBars, faTimes,
-  faGrip, faList, faMoon, faSun, faPalette, faCheck
+  faGrip, faList, faMoon, faSun, faPalette, faCheck,faGear,
+  faGears,
+  faNewspaper,
+  
 } from '@fortawesome/free-solid-svg-icons'
-import { 
-  faReact, faGithub, faStackOverflow,
-  faYoutube, faSpotify, faSteam
-} from '@fortawesome/free-brands-svg-icons'
+
+
+import { faGithub } from '@fortawesome/free-brands-svg-icons'
 import './App.css'
 
-// 示例数据 - 更新为7星评级系统
 const initialLinks = [
   {
     id: 1,
@@ -22,83 +23,110 @@ const initialLinks = [
     subCategory: '开发工具',
     description: 'Vercel 是一个云平台,用于构建、部署和扩展无服务器应用程序和静态网站',
     rating: 7,
-    icon: faGithub
+    icon: faGear
   },
   {
     id: 2,
-    title: 'Vite 官方文档',
-    url: 'https://vitejs.dev',
-    mainCategory: '开发',
-    subCategory: '工具',
-    description: '下一代前端构建工具',
-    rating: 6,
-    icon: faTools
+    title: 'happy-llm',
+    url: 'https://github.com/datawhalechina/happy-llm/tree/main',
+    mainCategory: 'github',
+    subCategory: '经典项目',
+    description: '从零开始的大语言模型原理与实践教程',
+    rating: 5,
+    icon: faGithub
   },
   {
     id: 3,
-    title: 'GitHub',
-    url: 'https://github.com',
-    mainCategory: '开发',
-    subCategory: '工具',
-    description: '全球最大的代码托管平台',
-    rating: 7,
+    title: 'llm-universe',
+    url: 'https://github.com/datawhalechina/llm-universe',
+    mainCategory: 'github',
+    subCategory: '经典项目',
+    description: '动手学大模型应用开发',
+    rating: 5,
     icon: faGithub
   },
   {
     id: 4,
-    title: 'Stack Overflow',
-    url: 'https://stackoverflow.com',
-    mainCategory: '开发',
-    subCategory: '社区',
-    description: '程序员问答社区',
-    rating: 6,
-    icon: faStackOverflow
+    title: '潮流周刊',
+    url: 'https://weekly.tw93.fun/',
+    mainCategory: '新闻',
+    subCategory: '技术',
+    description: '每周一更新一次',
+    rating: 5,
+    icon: faGithub
   },
   {
     id: 5,
-    title: 'YouTube',
-    url: 'https://youtube.com',
-    mainCategory: '娱乐',
-    subCategory: '视频',
-    description: '视频分享平台',
+    title: 'hello-github',
+    url: 'https://hellogithub.com/',
+    mainCategory: '新闻',
+    subCategory: '技术',
+    description: 'hello-github 是一个分享 GitHub 上有趣、入门级的开源项目',
     rating: 5,
-    icon: faYoutube
-  },
-  {
+    icon: faGithub
+  },{
     id: 6,
-    title: 'Spotify',
-    url: 'https://spotify.com',
-    mainCategory: '娱乐',
-    subCategory: '音乐',
-    description: '音乐流媒体服务',
-    rating: 4,
-    icon: faSpotify
+    title: 'hello算法',
+    url: 'https://www.hello-algo.com/',
+    mainCategory: '研发',
+    subCategory: '算法',
+    description: '画图解、一键运行的数据结构与算法教程',
+    rating: 5,
+    icon: faBook
+  },{
+    id: 7,
+    title: '科技爱好者周刊',
+    url: 'https://github.com/ruanyf/weekly',
+    mainCategory: '新闻/周刊',
+    subCategory: '科技',
+    description: '记录每周值得分享的科技内容，周五发布。',
+    rating: 5,
+    icon: faBook
   },
   {
-    id: 7,
-    title: 'Steam',
-    url: 'https://store.steampowered.com',
-    mainCategory: '娱乐',
-    subCategory: '游戏',
-    description: '全球最大的PC游戏平台',
+    id: 8,
+    title: 'FNJ',
+    url: 'https://service.phoeniciatech.cn/',
+    mainCategory: '友商',
+    subCategory: '换电柜',
+    description: 'FNJ',
+    rating: 3,
+  },
+  {
+    id:9,
+    title: 'supabase',
+    url: 'https://supabase.com/',
+    mainCategory: '研发',
+    subCategory: '开发工具',
+    description: 'supabase 是一个开源的 Firebase 替代品，支持 PostgreSQL、MySQL、SQLite 和 MongoDB',
     rating: 5,
-    icon: faSteam
+    icon: faGear
   }
+
+
 ]
 
 // 分类配置
 const categories = {
-  '开发': {
-    icon: faCode,
-    subCategories: ['前端', '后端', '工具', '社区']
+  '研发': {
+    icon: faGears,
+    subCategories: ['开发工具', 'AI', 'UI','后端','前端','数据库','运维','安全','算法','其他']
   },
-  '学习': {
+  'github': {
     icon: faBook,
-    subCategories: ['编程', '设计', '语言']
+    subCategories: ['经典项目']
+  },
+  '新闻/周刊': {
+    icon: faNewspaper,
+    subCategories: ['技术','科技', '政治', '军事']
   },
   '娱乐': {
     icon: faGamepad,
-    subCategories: ['视频', '音乐', '游戏']
+    subCategories: ['游戏', '影视']
+  },
+  '友商': {
+    icon: faMoon,
+    subCategories: ['换电柜']
   }
 }
 
@@ -179,9 +207,9 @@ const themes = {
 function App() {
   const [links, setLinks] = useState(initialLinks)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedMainCategory, setSelectedMainCategory] = useState('开发')
+  const [selectedMainCategory, setSelectedMainCategory] = useState('研发')
   const [selectedSubCategory, setSelectedSubCategory] = useState('全部')
-  const [expandedCategories, setExpandedCategories] = useState(['开发'])
+  const [expandedCategories, setExpandedCategories] = useState(['研发'])
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
   const [currentTheme, setCurrentTheme] = useState('light')
