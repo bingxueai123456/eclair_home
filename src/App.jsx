@@ -16,13 +16,13 @@ import './App.css'
 const initialLinks = [
   {
     id: 1,
-    title: 'React 官方文档',
-    url: 'https://react.dev',
-    mainCategory: '开发',
-    subCategory: '前端',
-    description: 'React 官方文档，包含完整的教程和API参考',
+    title: 'vercel',
+    url: 'https://vercel.com/eclairs-projects-e8134ecf',
+    mainCategory: '研发',
+    subCategory: '开发工具',
+    description: 'Vercel 是一个云平台,用于构建、部署和扩展无服务器应用程序和静态网站',
     rating: 7,
-    icon: faReact
+    icon: faGithub
   },
   {
     id: 2,
