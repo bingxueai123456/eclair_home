@@ -110,6 +110,36 @@ const initialLinks = [
     description: 'feedMe 是一个分享有趣、实用的github信息，linux do信息，科技咨询等等信息的平台',
     rating: 5,
     icon: faNewspaper
+  },
+  {
+    id:11,
+    title: 'Cap captcha',
+    url: 'https://capjs.js.org/',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: '一个网页上的机器人识别工具，用作 CAPTCHA 方案，采用 SHA-256 工作量证明算法',
+    rating: 3,
+    icon: faGithub
+  },
+  {
+    id:12,
+    title: 'Pydoll',
+    url: 'https://github.com/autoscrape-labs/pydoll',
+    mainCategory: 'github',
+    subCategory: '自动化',
+    description: '一个操作浏览器的 Python 库，通过 Chrome DevTools Protocol，实现脚本操作本机的 Chrome 浏览器。',
+    rating: 4,
+    icon: faGithub
+  },
+  {
+    id:13,
+    title: 'AI每日资讯',
+    url: 'https://justlovemaki.github.io/CloudFlare-AI-Insight-Daily/today/book/',
+    mainCategory: '新闻/周刊',
+    subCategory: '技术',
+    description: 'AI每日资讯，每日更新',
+    rating: 5,
+    icon: faNewspaper
   }
 
 
@@ -123,7 +153,7 @@ const categories = {
   },
   'github': {
     icon: faBook,
-    subCategories: ['经典项目']
+    subCategories: ['经典项目','工具类','自动化']
   },
   '新闻/周刊': {
     icon: faNewspaper,
@@ -260,8 +290,8 @@ function YoutubeSubs() {
 function App() {
   const [links, setLinks] = useState(initialLinks)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedMainCategory, setSelectedMainCategory] = useState(null)
-  const [selectedSubCategory, setSelectedSubCategory] = useState(null)
+  const [selectedMainCategory, setSelectedMainCategory] = useState('全部')
+  const [selectedSubCategory, setSelectedSubCategory] = useState('全部')
   const [expandedCategories, setExpandedCategories] = useState([])
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
