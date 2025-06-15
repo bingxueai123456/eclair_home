@@ -6,12 +6,17 @@ import {
   faChevronDown, faChevronRight, faBars, faTimes,
   faGrip, faList, faMoon, faSun, faPalette, faCheck,faGear,
   faGears,
-  faNewspaper
+  faNewspaper,
+  faFilePowerpoint,
+  faFileText,
+  faSync,
+  faSpinner
 } from '@fortawesome/free-solid-svg-icons'
 
-import { faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons'
+import { faCreativeCommonsNc, faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import './App.css'
 import useYoutubeRssFeed from './useYoutubeRssFeed'
+import { useGlobalSearch, SearchResults } from './useGlobalSearch'
 
 const initialLinks = [
   {
@@ -149,6 +154,15 @@ const initialLinks = [
     description: 'Gotify 是一个开源的推送通知服务，支持多种客户端',
     rating: 5,
     icon: faGear
+  }, {
+    id:15,
+    title: 'Gamma.app',
+    url: 'https://gamma.app/',
+    mainCategory: '研发',
+    subCategory: 'AI',
+    description: '一个由 AI 驱动的新一代内容创建工具，可以看作是"AI 时代的 PowerPoint(PPT) ,Canva,webPage 创建"',
+    rating: 7,
+    icon: faFilePowerpoint
   }
 
 
@@ -252,8 +266,21 @@ const themes = {
   }
 }
 
-function YoutubeSubs() {
-  const { feeds: youtubeFeeds, loading: youtubeLoading, error: youtubeError } = useYoutubeRssFeed()
+// 博客文章数据配置
+const initialBlogs = [
+  {
+    id: 1,
+    title: '美元全球经济影响机制',
+    url: './src/html/美元全球经济影响机制.html',
+    description: '分析美元在全球经济体系中的影响机制和作用',
+    category: '经济分析',
+    date: '2024-01-15',
+    tags: ['经济', '美元', '全球化']
+  }
+  // 可以继续在这里添加更多博客文章
+]
+
+function YoutubeSubs({ feeds, loading, error, lastFetch, onRefresh }) {
   // 时间格式化
   const formatDate = (dateStr) => {
     if (!dateStr) return ''
@@ -261,12 +288,46 @@ function YoutubeSubs() {
     if (isNaN(d.getTime())) return ''
     return d.toISOString().slice(0,10)
   }
+
   return (
     <div className="youtube-subs-section">
-      <div className="youtube-subs-title">youtubo订阅</div>
-      {youtubeLoading && <div>加载中...</div>}
-      {youtubeError && <div style={{color:'red'}}>YouTube加载失败: {youtubeError}</div>}
-      {!youtubeLoading && youtubeFeeds.map(feed => (
+      <div className="youtube-header">
+        <div className="youtube-subs-title">youtubo订阅</div>
+        <div className="youtube-controls">
+          {lastFetch && (
+            <span className="last-update">最后更新: {lastFetch}</span>
+          )}
+          <button 
+            className="refresh-btn"
+            onClick={() => onRefresh(false)}
+            disabled={loading}
+            title="刷新YouTube数据（使用缓存）"
+          >
+            <FontAwesomeIcon icon={loading ? faSpinner : faSync} spin={loading} />
+            {loading ? '刷新中...' : '刷新'}
+          </button>
+          <button 
+            className="refresh-btn force"
+            onClick={() => onRefresh(true)}
+            disabled={loading}
+            title="强制刷新（忽略缓存）"
+          >
+            <FontAwesomeIcon icon={loading ? faSpinner : faSync} spin={loading} />
+            强制刷新
+          </button>
+        </div>
+      </div>
+      {loading && <div className="loading-message">🔄 正在获取最新视频...</div>}
+      {error && <div style={{color:'red'}}>YouTube加载失败: {error}</div>}
+      
+      {/* 调试信息 */}
+      <div className="debug-info">
+        <p>📊 频道数量: {feeds ? feeds.length : 0}</p>
+        <p>🎬 总视频数: {feeds ? feeds.reduce((total, feed) => total + (feed.items?.length || 0), 0) : 0}</p>
+        <p>💾 缓存状态: {localStorage.getItem('youtube-feeds-cache') ? '有缓存' : '无缓存'}</p>
+      </div>
+      
+      {!loading && feeds && feeds.map(feed => (
         <div key={feed.channelId} className="youtube-channel-row">
           <div className="youtube-channel-title">{feed.channelTitle}</div>
           <div className="youtube-videos-row">
@@ -296,18 +357,119 @@ function YoutubeSubs() {
   )
 }
 
+function BlogCollection() {
+  const [blogs] = useState(initialBlogs)
+  const [selectedCategory, setSelectedCategory] = useState('全部')
+
+  // 获取所有分类
+  const categories = ['全部', ...new Set(blogs.map(blog => blog.category))]
+
+  // 过滤博客
+  const filteredBlogs = selectedCategory === '全部' 
+    ? blogs 
+    : blogs.filter(blog => blog.category === selectedCategory)
+
+  // 格式化日期
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr)
+    return date.toLocaleDateString('zh-CN', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  }
+
+  return (
+    <div className="blog-collection">
+      <div className="blog-header">
+        <h1>
+          <FontAwesomeIcon icon={faFileText} />
+          博客集
+        </h1>
+        <p>静态网页文章收集</p>
+      </div>
+
+      {/* 分类筛选 */}
+      <div className="blog-categories">
+        {categories.map(category => (
+          <button
+            key={category}
+            className={`category-filter-btn ${selectedCategory === category ? 'active' : ''}`}
+            onClick={() => setSelectedCategory(category)}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+
+      {/* 博客列表 */}
+      <div className="blog-list">
+        {filteredBlogs.length > 0 ? (
+          filteredBlogs.map(blog => (
+            <div key={blog.id} className="blog-card">
+              <div className="blog-card-header">
+                <h3 className="blog-title">{blog.title}</h3>
+                <span className="blog-date">{formatDate(blog.date)}</span>
+              </div>
+              
+              <div className="blog-meta">
+                <span className="blog-category">{blog.category}</span>
+                <div className="blog-tags">
+                  {blog.tags.map((tag, index) => (
+                    <span key={index} className="blog-tag">#{tag}</span>
+                  ))}
+                </div>
+              </div>
+              
+              <p className="blog-description">{blog.description}</p>
+              
+              <div className="blog-actions">
+                <a 
+                  href={blog.url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="blog-read-btn"
+                >
+                  <FontAwesomeIcon icon={faFileText} />
+                  阅读文章
+                </a>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="no-blogs">
+            <FontAwesomeIcon icon={faFileText} />
+            <p>暂无该分类下的文章</p>
+          </div>
+        )}
+      </div>
+
+      {/* 添加说明 */}
+      <div className="blog-footer">
+        <p>💡 提示：要添加新的博客文章，请在代码中的 initialBlogs 数组里添加相应配置</p>
+      </div>
+    </div>
+  )
+}
+
 function App() {
   const [links, setLinks] = useState(initialLinks)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedMainCategory, setSelectedMainCategory] = useState('全部')
+  const [selectedMainCategory, setSelectedMainCategory] = useState('研发')
   const [selectedSubCategory, setSelectedSubCategory] = useState('全部')
-  const [expandedCategories, setExpandedCategories] = useState([])
+  const [expandedCategories, setExpandedCategories] = useState(['研发'])
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
   const [currentTheme, setCurrentTheme] = useState('light')
   const [showGradientPicker, setShowGradientPicker] = useState(false)
   const [currentGradient, setCurrentGradient] = useState(gradientPresets[0])
-  const [activeMenu, setActiveMenu] = useState('youtube') // 默认打开youtubo订阅
+  const [activeMenu, setActiveMenu] = useState('main') // 默认打开主页面
+  
+  // 获取YouTube数据
+  const { feeds: youtubeFeeds, loading: youtubeLoading, error: youtubeError, lastFetch, refresh } = useYoutubeRssFeed()
+  
+  // 使用全局搜索
+  const searchResults = useGlobalSearch(searchTerm, links, initialBlogs, youtubeFeeds)
 
   // 初始化和更新主题
   useEffect(() => {
@@ -370,16 +532,8 @@ function App() {
     setIsMobileMenuOpen(false)
   }
 
+  // 普通分类筛选（当没有搜索词时使用）
   const filteredLinks = links.filter(link => {
-    const matchesSearch = link.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         link.description.toLowerCase().includes(searchTerm.toLowerCase())
-    
-    // 如果有搜索词，则进行全局搜索，忽略分类筛选
-    if (searchTerm.trim()) {
-      return matchesSearch
-    }
-    
-    // 如果没有搜索词，则按分类筛选
     const matchesMainCategory = selectedMainCategory === '全部' || link.mainCategory === selectedMainCategory
     const matchesSubCategory = selectedSubCategory === '全部' || link.subCategory === selectedSubCategory
     return matchesMainCategory && matchesSubCategory
@@ -396,6 +550,25 @@ function App() {
     setSelectedSubCategory(subCategory)
     setIsMobileMenuOpen(false) // 移动端选择后关闭菜单
     setActiveMenu('main') // 切回主内容
+    setSearchTerm('') // 清除搜索词
+  }
+
+  // 处理搜索结果项点击
+  const handleSearchItemClick = (type, item) => {
+    setActiveMenu(type)
+    setSearchTerm('') // 清除搜索词
+    setIsMobileMenuOpen(false)
+  }
+
+  // 当搜索时，自动切换到搜索页面
+  const handleSearchChange = (e) => {
+    const term = e.target.value
+    setSearchTerm(term)
+    if (term.trim()) {
+      setActiveMenu('search')
+    } else if (activeMenu === 'search') {
+      setActiveMenu('main') // 如果清空搜索，回到主页面
+    }
   }
 
   const handleThemeChange = (theme) => {
@@ -523,9 +696,9 @@ function App() {
           <FontAwesomeIcon icon={faSearch} />
           <input
             type="text"
-            placeholder="全局搜索网站..."
+            placeholder="搜索网站、博客、视频..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
 
@@ -567,14 +740,22 @@ function App() {
           </div>
         </div>
         
-        {/* 新增YouTube订阅菜单按钮 */}
-        <div className="youtube-menu-entry">
+        {/* 特殊菜单区域 */}
+        <div className="special-menus">
           <button
-            className={`youtube-menu-btn ${activeMenu === 'youtube' ? 'active' : ''}`}
+            className={`special-menu-btn youtube ${activeMenu === 'youtube' ? 'active' : ''}`}
             onClick={() => setActiveMenu('youtube')}
           >
-            <FontAwesomeIcon icon={faYoutube} style={{color:'#e53935',marginRight:6}} />
+            <FontAwesomeIcon icon={faYoutube} />
             youtubo订阅
+          </button>
+          
+          <button
+            className={`special-menu-btn blog ${activeMenu === 'blog' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('blog')}
+          >
+            <FontAwesomeIcon icon={faFileText} />
+            博客集
           </button>
         </div>
         
@@ -618,29 +799,25 @@ function App() {
       </aside>
 
       <main className="main-content">
+        {activeMenu === 'search' && (
+          <SearchResults 
+            searchResults={searchResults}
+            searchTerm={searchTerm}
+            onItemClick={handleSearchItemClick}
+          />
+        )}
+        
         {activeMenu === 'main' && (
           <>
             <div className="content-header">
               <h1>
-                {searchTerm.trim() ? (
+                {selectedMainCategory !== '全部' && (
                   <>
-                    <FontAwesomeIcon icon={faSearch} />
-                    搜索结果: "{searchTerm}" 
-                    <span style={{ fontSize: '0.8em', color: 'var(--text-secondary)', marginLeft: '8px' }}>
-                      ({filteredLinks.length} 个结果)
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    {selectedMainCategory !== '全部' && (
-                      <>
-                        <FontAwesomeIcon icon={categories[selectedMainCategory].icon} />
-                        {selectedMainCategory}
-                      </>
-                    )}
-                    {selectedSubCategory !== '全部' && ` > ${selectedSubCategory}`}
+                    <FontAwesomeIcon icon={categories[selectedMainCategory].icon} />
+                    {selectedMainCategory}
                   </>
                 )}
+                {selectedSubCategory !== '全部' && ` > ${selectedSubCategory}`}
               </h1>
             </div>
 
@@ -674,7 +851,16 @@ function App() {
             </div>
           </>
         )}
-        {activeMenu === 'youtube' && <YoutubeSubs />}
+        {activeMenu === 'youtube' && (
+          <YoutubeSubs 
+            feeds={youtubeFeeds}
+            loading={youtubeLoading}
+            error={youtubeError}
+            lastFetch={lastFetch}
+            onRefresh={refresh}
+          />
+        )}
+        {activeMenu === 'blog' && <BlogCollection />}
       </main>
     </div>
   )

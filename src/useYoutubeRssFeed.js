@@ -19,11 +19,56 @@ export default function useYoutubeRssFeed() {
   const [feeds, setFeeds] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [lastFetch, setLastFetch] = useState(null)
 
-  useEffect(() => {
+  // 获取缓存数据
+  const getCachedData = () => {
+    try {
+      const cached = localStorage.getItem('youtube-feeds-cache')
+      const timestamp = localStorage.getItem('youtube-feeds-timestamp')
+      if (cached && timestamp) {
+        const cacheAge = Date.now() - parseInt(timestamp)
+        // 缓存5分钟
+        if (cacheAge < 5 * 60 * 1000) {
+          return JSON.parse(cached)
+        }
+      }
+    } catch (e) {
+      console.warn('缓存读取失败:', e)
+    }
+    return null
+  }
+
+  // 保存缓存数据
+  const setCachedData = (data) => {
+    try {
+      localStorage.setItem('youtube-feeds-cache', JSON.stringify(data))
+      localStorage.setItem('youtube-feeds-timestamp', Date.now().toString())
+    } catch (e) {
+      console.warn('缓存保存失败:', e)
+    }
+  }
+
+  const fetchFeeds = async (forceRefresh = false) => {
     let cancelled = false
     setLoading(true)
     setError(null)
+    
+    // 如果不是强制刷新，先尝试使用缓存
+    if (!forceRefresh) {
+      const cachedFeeds = getCachedData()
+      if (cachedFeeds) {
+        setFeeds(cachedFeeds)
+        setLoading(false)
+        setLastFetch(new Date().toLocaleTimeString())
+        return
+      }
+    } else {
+      // 强制刷新时清除缓存
+      localStorage.removeItem('youtube-feeds-cache')
+      localStorage.removeItem('youtube-feeds-timestamp')
+    }
+
     const parser = new XMLParser({ ignoreAttributes: false })
 
     Promise.all(
@@ -77,7 +122,9 @@ export default function useYoutubeRssFeed() {
     ).then(results => {
       if (!cancelled) {
         setFeeds(results)
+        setCachedData(results)
         setLoading(false)
+        setLastFetch(new Date().toLocaleTimeString())
       }
     }).catch(e => {
       if (!cancelled) {
@@ -86,7 +133,11 @@ export default function useYoutubeRssFeed() {
       }
     })
     return () => { cancelled = true }
+  }
+
+  useEffect(() => {
+    fetchFeeds()
   }, [])
 
-  return { feeds, loading, error }
+  return { feeds, loading, error, lastFetch, refresh: fetchFeeds }
 } 
