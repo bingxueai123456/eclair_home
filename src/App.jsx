@@ -140,6 +140,15 @@ const initialLinks = [
     description: 'AI每日资讯，每日更新',
     rating: 5,
     icon: faNewspaper
+  },{
+    id:14,
+    title: 'Gotify',
+    url: 'https://gotify.net/',
+    mainCategory: '研发',
+    subCategory: '开发工具',
+    description: 'Gotify 是一个开源的推送通知服务，支持多种客户端',
+    rating: 5,
+    icon: faGear
   }
 
 
