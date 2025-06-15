@@ -6,13 +6,12 @@ import {
   faChevronDown, faChevronRight, faBars, faTimes,
   faGrip, faList, faMoon, faSun, faPalette, faCheck,faGear,
   faGears,
-  faNewspaper,
-  
+  faNewspaper
 } from '@fortawesome/free-solid-svg-icons'
 
-
-import { faGithub } from '@fortawesome/free-brands-svg-icons'
+import { faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import './App.css'
+import useYoutubeRssFeed from './useYoutubeRssFeed'
 
 const initialLinks = [
   {
@@ -101,6 +100,16 @@ const initialLinks = [
     description: 'supabase 是一个开源的 Firebase 替代品，支持 PostgreSQL、MySQL、SQLite 和 MongoDB',
     rating: 5,
     icon: faGear
+  },
+  {
+    id:10,
+    title: 'feedMe',
+    url: 'https://feedme.icu/',
+    mainCategory: '新闻/周刊',
+    subCategory: '技术',
+    description: 'feedMe 是一个分享有趣、实用的github信息，linux do信息，科技咨询等等信息的平台',
+    rating: 5,
+    icon: faNewspaper
   }
 
 
@@ -204,17 +213,62 @@ const themes = {
   }
 }
 
+function YoutubeSubs() {
+  const { feeds: youtubeFeeds, loading: youtubeLoading, error: youtubeError } = useYoutubeRssFeed()
+  // 时间格式化
+  const formatDate = (dateStr) => {
+    if (!dateStr) return ''
+    const d = new Date(dateStr)
+    if (isNaN(d.getTime())) return ''
+    return d.toISOString().slice(0,10)
+  }
+  return (
+    <div className="youtube-subs-section">
+      <div className="youtube-subs-title">youtubo订阅</div>
+      {youtubeLoading && <div>加载中...</div>}
+      {youtubeError && <div style={{color:'red'}}>YouTube加载失败: {youtubeError}</div>}
+      {!youtubeLoading && youtubeFeeds.map(feed => (
+        <div key={feed.channelId} className="youtube-channel-row">
+          <div className="youtube-channel-title">{feed.channelTitle}</div>
+          <div className="youtube-videos-row">
+            {[...feed.items].sort((a,b)=>new Date(b.pubDate)-new Date(a.pubDate)).map(video => (
+              <a
+                key={video.link}
+                className="youtube-video-card"
+                href={video.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={video.title}
+              >
+                <img
+                  src={video.thumbnail || `https://i.ytimg.com/vi/${video.link.split('v=')[1]}/hqdefault.jpg`}
+                  alt={video.title}
+                  className="youtube-video-thumb"
+                />
+                <div className="youtube-video-title">{video.title}</div>
+                <div className="youtube-video-channel">{video.channelTitle}</div>
+                <div className="youtube-video-date">{formatDate(video.pubDate)}</div>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function App() {
   const [links, setLinks] = useState(initialLinks)
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedMainCategory, setSelectedMainCategory] = useState('研发')
-  const [selectedSubCategory, setSelectedSubCategory] = useState('全部')
-  const [expandedCategories, setExpandedCategories] = useState(['研发'])
+  const [selectedMainCategory, setSelectedMainCategory] = useState(null)
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null)
+  const [expandedCategories, setExpandedCategories] = useState([])
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
   const [currentTheme, setCurrentTheme] = useState('light')
   const [showGradientPicker, setShowGradientPicker] = useState(false)
   const [currentGradient, setCurrentGradient] = useState(gradientPresets[0])
+  const [activeMenu, setActiveMenu] = useState('youtube') // 默认打开youtubo订阅
 
   // 初始化和更新主题
   useEffect(() => {
@@ -252,6 +306,14 @@ function App() {
       root.style.removeProperty('--primary-color')
     }
   }, [currentTheme, currentGradient])
+
+  // 切回main时，若分类为null，自动设为默认
+  useEffect(() => {
+    if (activeMenu === 'main' && !selectedMainCategory) {
+      setSelectedMainCategory('研发')
+      setSelectedSubCategory('全部')
+    }
+  }, [activeMenu, selectedMainCategory])
 
   const toggleCategory = (category) => {
     setExpandedCategories(prev => 
@@ -294,6 +356,7 @@ function App() {
     setSelectedMainCategory(mainCategory)
     setSelectedSubCategory(subCategory)
     setIsMobileMenuOpen(false) // 移动端选择后关闭菜单
+    setActiveMenu('main') // 切回主内容
   }
 
   const handleThemeChange = (theme) => {
@@ -465,6 +528,17 @@ function App() {
           </div>
         </div>
         
+        {/* 新增YouTube订阅菜单按钮 */}
+        <div className="youtube-menu-entry">
+          <button
+            className={`youtube-menu-btn ${activeMenu === 'youtube' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('youtube')}
+          >
+            <FontAwesomeIcon icon={faYoutube} style={{color:'#e53935',marginRight:6}} />
+            youtubo订阅
+          </button>
+        </div>
+        
         <nav className="category-nav">
           {Object.entries(categories).map(([category, { icon, subCategories }]) => (
             <div key={category} className="category-group">
@@ -483,7 +557,7 @@ function App() {
               {expandedCategories.includes(category) && (
                 <div className="sub-categories">
                   <button
-                    className={`sub-category ${selectedMainCategory === category && selectedSubCategory === '全部' ? 'active' : ''}`}
+                    className={`sub-category ${activeMenu === 'main' && selectedMainCategory === category && selectedSubCategory === '全部' ? 'active' : ''}`}
                     onClick={() => handleCategorySelect(category, '全部')}
                   >
                     全部
@@ -491,7 +565,7 @@ function App() {
                   {subCategories.map(subCategory => (
                     <button
                       key={subCategory}
-                      className={`sub-category ${selectedMainCategory === category && selectedSubCategory === subCategory ? 'active' : ''}`}
+                      className={`sub-category ${activeMenu === 'main' && selectedMainCategory === category && selectedSubCategory === subCategory ? 'active' : ''}`}
                       onClick={() => handleCategorySelect(category, subCategory)}
                     >
                       {subCategory}
@@ -505,58 +579,63 @@ function App() {
       </aside>
 
       <main className="main-content">
-        <div className="content-header">
-          <h1>
-            {searchTerm.trim() ? (
-              <>
-                <FontAwesomeIcon icon={faSearch} />
-                搜索结果: "{searchTerm}" 
-                <span style={{ fontSize: '0.8em', color: 'var(--text-secondary)', marginLeft: '8px' }}>
-                  ({filteredLinks.length} 个结果)
-                </span>
-              </>
-            ) : (
-              <>
-                {selectedMainCategory !== '全部' && (
+        {activeMenu === 'main' && (
+          <>
+            <div className="content-header">
+              <h1>
+                {searchTerm.trim() ? (
                   <>
-                    <FontAwesomeIcon icon={categories[selectedMainCategory].icon} />
-                    {selectedMainCategory}
+                    <FontAwesomeIcon icon={faSearch} />
+                    搜索结果: "{searchTerm}" 
+                    <span style={{ fontSize: '0.8em', color: 'var(--text-secondary)', marginLeft: '8px' }}>
+                      ({filteredLinks.length} 个结果)
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    {selectedMainCategory !== '全部' && (
+                      <>
+                        <FontAwesomeIcon icon={categories[selectedMainCategory].icon} />
+                        {selectedMainCategory}
+                      </>
+                    )}
+                    {selectedSubCategory !== '全部' && ` > ${selectedSubCategory}`}
                   </>
                 )}
-                {selectedSubCategory !== '全部' && ` > ${selectedSubCategory}`}
-              </>
-            )}
-          </h1>
-        </div>
-
-        <div className={`links-container ${viewMode}`}>
-          {filteredLinks.length > 0 ? (
-            filteredLinks.map(link => (
-              <div key={link.id} className="link-card">
-                <div className="link-header">
-                  <div className="link-title">
-                    <FontAwesomeIcon icon={link.icon} className="link-icon" />
-                    <h3>{link.title}</h3>
-                  </div>
-                  {renderStarRating(link.id, link.rating)}
-                </div>
-                <div className="link-tags">
-                  <span className="category-tag">{link.mainCategory}</span>
-                  <span className="category-tag">{link.subCategory}</span>
-                  <span className="rating-badge">{link.rating}⭐</span>
-                </div>
-                <p className="description">{link.description}</p>
-                <a href={link.url} target="_blank" rel="noopener noreferrer">
-                  访问网站
-                </a>
-              </div>
-            ))
-          ) : (
-            <div className="no-results">
-              未找到匹配的网站
+              </h1>
             </div>
-          )}
-        </div>
+
+            <div className={`links-container ${viewMode}`}>
+              {filteredLinks.length > 0 ? (
+                filteredLinks.map(link => (
+                  <div key={link.id} className="link-card">
+                    <div className="link-header">
+                      <div className="link-title">
+                        <FontAwesomeIcon icon={link.icon} className="link-icon" />
+                        <h3>{link.title}</h3>
+                      </div>
+                      {renderStarRating(link.id, link.rating)}
+                    </div>
+                    <div className="link-tags">
+                      <span className="category-tag">{link.mainCategory}</span>
+                      <span className="category-tag">{link.subCategory}</span>
+                      <span className="rating-badge">{link.rating}⭐</span>
+                    </div>
+                    <p className="description">{link.description}</p>
+                    <a href={link.url} target="_blank" rel="noopener noreferrer">
+                      访问网站
+                    </a>
+                  </div>
+                ))
+              ) : (
+                <div className="no-results">
+                  未找到匹配的网站
+                </div>
+              )}
+            </div>
+          </>
+        )}
+        {activeMenu === 'youtube' && <YoutubeSubs />}
       </main>
     </div>
   )

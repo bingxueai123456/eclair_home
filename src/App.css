@@ -950,3 +950,140 @@ body {
     height: 60px;
   }
 }
+
+/* youtubo订阅区样式优化 */
+.youtube-subs-section {
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 32px 20px 24px 20px;
+  margin-top: 32px;
+}
+.youtube-subs-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #222;
+  margin-bottom: 18px;
+  border-left: 5px solid #e53935;
+  padding-left: 12px;
+  background: linear-gradient(90deg,#e53935 0%,#e35d5b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.youtube-channel-title {
+  font-weight: 600;
+  font-size: 1.15em;
+  margin-bottom: 10px;
+  color: #e53935;
+  letter-spacing: 0.5px;
+  padding-left: 2px;
+}
+.youtube-videos-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.youtube-video-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.09);
+  text-decoration: none;
+  color: #222;
+  transition: box-shadow 0.2s, transform 0.2s;
+  padding: 10px 8px 14px 8px;
+  margin-bottom: 0;
+}
+.youtube-video-card:hover {
+  box-shadow: 0 4px 16px rgba(229,57,53,0.18);
+  transform: translateY(-2px) scale(1.04);
+}
+.youtube-video-thumb {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 7px;
+  margin-bottom: 8px;
+}
+.youtube-video-title {
+  font-size: 1em;
+  font-weight: 500;
+  margin-bottom: 2px;
+  text-align: center;
+  line-height: 1.2;
+  max-height: 2.4em;
+  overflow: hidden;
+}
+.youtube-video-channel {
+  font-size: 0.9em;
+  color: #b71c1c;
+  text-align: center;
+  margin-bottom: 2px;
+}
+.youtube-video-date {
+  font-size: 0.85em;
+  color: #888;
+  margin-top: 2px;
+  text-align: center;
+}
+@media (max-width: 900px) {
+  .youtube-video-card { width: 48vw; }
+}
+@media (max-width: 600px) {
+  .youtube-videos-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .youtube-video-card {
+    width: 100%;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 8px;
+  }
+  .youtube-video-thumb {
+    width: 90px;
+    height: 60px;
+    margin-right: 8px;
+    margin-bottom: 0;
+  }
+  .youtube-video-title, .youtube-video-channel, .youtube-video-date {
+    text-align: left;
+  }
+}
+
+.youtube-menu-entry {
+  margin: 18px 0 12px 0;
+  display: flex;
+  justify-content: center;
+}
+.youtube-menu-btn {
+  width: 90%;
+  display: flex;
+  align-items: center;
+  font-size: 1.15em;
+  font-weight: 500;
+  background: #fff;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  padding: 14px 18px;
+  margin: 0 auto;
+  cursor: pointer;
+  transition: box-shadow 0.18s, background 0.18s;
+  color: #222;
+  outline: none;
+  gap: 10px;
+}
+.youtube-menu-btn.active, .youtube-menu-btn:hover {
+  background: linear-gradient(90deg,#e53935 0%,#e35d5b 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(229,57,53,0.13);
+}
+.youtube-menu-btn .svg-inline--fa {
+  font-size: 1.3em;
+}
