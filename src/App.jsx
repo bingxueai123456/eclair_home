@@ -160,9 +160,35 @@ const initialLinks = [
     url: 'https://gamma.app/',
     mainCategory: '研发',
     subCategory: 'AI',
-    description: '一个由 AI 驱动的新一代内容创建工具，可以看作是"AI 时代的 PowerPoint(PPT) ,Canva,webPage 创建"',
+    description: '一个由 AI 驱动的新一代内容创建工具，可以看作是"AI 时代的 PowerPoint(PPT) ,Canva,webPage 创建',
     rating: 7,
     icon: faFilePowerpoint
+  },{
+    id:16,
+    title: '去安卓应用开屏广告',
+    url: 'https://github.com/gkd-kit/gkd',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: '自动去除各种软件开屏广告以及自动操作的工具',
+    rating: 7,
+    icon: faGithub
+  },{
+    id:17,
+    title: 'PayQrcode',
+    url: 'https://github.com/uxiaohan/PayQrcode',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: '一个合并微信、支付宝收款码的工具',
+    rating: 7,
+    icon: faGithub
+  },{
+    id:18,
+    title: '图标库 Lucide',
+    url: 'https://lucide.dev/',
+    mainCategory: '研发',
+    subCategory: 'UI',
+    description: '需要风格统一，主题色一致，不想麻烦的选择 icon的一个图标库',
+    rating: 7,
   }
 
 
