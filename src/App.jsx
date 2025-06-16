@@ -297,7 +297,7 @@ const initialBlogs = [
   {
     id: 1,
     title: '美元全球经济影响机制',
-    url: './src/html/美元全球经济影响机制.html',
+    url: '/html/美元全球经济影响机制.html',
     description: '分析美元在全球经济体系中的影响机制和作用',
     category: '经济分析',
     date: '2024-01-15',
