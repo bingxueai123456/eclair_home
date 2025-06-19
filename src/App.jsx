@@ -231,6 +231,15 @@ const initialLinks = [
     subCategory: '经济',
     description: '小鹅通-草帽未来',
     rating: 6,
+  },
+  {
+    id:24,
+    title: '免费奈飞观看',
+    url: 'https://www.netflixgc.com/',
+    mainCategory: '娱乐',
+    subCategory: '影视',
+    description: '免费奈飞观看',
+    rating: 6,
   }
 
 ]
