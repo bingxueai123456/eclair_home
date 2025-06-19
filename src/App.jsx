@@ -182,15 +182,40 @@ const initialLinks = [
     rating: 7,
     icon: faGithub
   },{
-      id:18,
-      title: '图标库 Lucide',
-      url: 'https://lucide.dev/',
-      mainCategory: '研发',
-      subCategory: 'UI',
-      description: '需要风格统一，主题色一致，不想麻烦的选择 icon的一个图标库',
-      rating: 7,
+    id:18,
+    title: '图标库 Lucide',
+    url: 'https://lucide.dev/',
+    mainCategory: '研发',
+    subCategory: 'UI',
+    description: '需要风格统一，主题色一致，不想麻烦的选择 icon的一个图标库',
+    rating: 7,
   },{
     id:19,
+    title: '中国人民银行',
+    url: 'http://www.pbc.gov.cn/',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '中国人民银行官网,查看统计数据',
+    rating: 7,
+  },{
+    id:20,
+    title: '国家统计局',
+    url: 'https://www.stats.gov.cn/sj/',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '国家统计局官网,查看统计数据',
+    rating: 7,
+  },{
+    id:21,
+    title: '海关总署',
+    url: 'http://www.customs.gov.cn/customs/syx/index.html/',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '国家统计局官网,查看统计数据',
+    rating: 7,
+  }
+  ,{
+    id:22,
     title: 'YD-BMS',
     url: 'https://www.ievcloud.com/online/login',
     mainCategory: '友商',
@@ -214,7 +239,7 @@ const categories = {
   },
   '新闻/周刊': {
     icon: faNewspaper,
-    subCategories: ['技术','科技', '政治', '军事']
+    subCategories: ['技术','科技', '政治', '军事','经济']
   },
   '娱乐': {
     icon: faGamepad,
