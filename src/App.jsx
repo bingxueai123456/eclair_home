@@ -182,15 +182,23 @@ const initialLinks = [
     rating: 7,
     icon: faGithub
   },{
-    id:18,
-    title: '图标库 Lucide',
-    url: 'https://lucide.dev/',
-    mainCategory: '研发',
-    subCategory: 'UI',
-    description: '需要风格统一，主题色一致，不想麻烦的选择 icon的一个图标库',
-    rating: 7,
-  }
+      id:18,
+      title: '图标库 Lucide',
+      url: 'https://lucide.dev/',
+      mainCategory: '研发',
+      subCategory: 'UI',
+      description: '需要风格统一，主题色一致，不想麻烦的选择 icon的一个图标库',
+      rating: 7,
+  },{
+    id:19,
+    title: 'YD-BMS',
+    url: 'https://www.ievcloud.com/online/login',
+    mainCategory: '友商',
+    subCategory: '换电柜',
+    description: 'YD-BMS',
+    rating: 6,
 
+  }
 
 ]
 
