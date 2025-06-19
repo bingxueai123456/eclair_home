@@ -223,6 +223,14 @@ const initialLinks = [
     description: 'YD-BMS',
     rating: 6,
 
+  },{
+    id:23,
+    title: '草帽未来圈子',
+    url: 'https://quanzi.xiaoe-tech.com/c_68221dcd51f62_KXAivbAT5439/feed_list?app_id=apphxnsyo2v3845&product_id=',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '小鹅通-草帽未来',
+    rating: 6,
   }
 
 ]
