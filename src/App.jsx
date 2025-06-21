@@ -240,8 +240,34 @@ const initialLinks = [
     subCategory: '影视',
     description: '免费奈飞观看',
     rating: 6,
+  },
+  {
+    id: 25,
+    title: '国家发改委',
+    url: 'https://www.ndrc.gov.cn/',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '国家发展和改革委员会官网，查看发展政策和宏观经济调控信息',
+    rating: 7,
+  },
+  {
+    id: 26,
+    title: '财政部',
+    url: 'http://www.mof.gov.cn/index.htm',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '中华人民共和国财政部官网，查看财政政策和预算信息',
+    rating: 7,
+  },
+  {
+    id: 27,
+    title: 'Wind资讯',
+    url: 'https://www.wind.com.cn/',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: 'Wind金融终端，专业的金融数据和资讯服务平台',
+    rating: 6,
   }
-
 ]
 
 // 分类配置
