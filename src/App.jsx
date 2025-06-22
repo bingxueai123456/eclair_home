@@ -267,7 +267,16 @@ const initialLinks = [
     subCategory: '经济',
     description: 'Wind金融终端，专业的金融数据和资讯服务平台',
     rating: 6,
+  },{
+    id: 28,
+    title: '3D 图标网站',
+    url: 'https://www.thiings.co/things',
+    mainCategory: '研发',
+    subCategory: 'UI',
+    description: '3D 图标网站',
+    rating: 7,
   }
+
 ]
 
 // 分类配置
