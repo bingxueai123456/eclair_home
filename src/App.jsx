@@ -275,6 +275,14 @@ const initialLinks = [
     subCategory: 'UI',
     description: '3D 图标网站',
     rating: 7,
+  },{
+    id: 29,
+    title: 'EasySpider',
+    url: 'https://github.com/NaiboWang/EasySpider',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'EasySpider 是一个基于 Python 的爬虫框架，支持多种数据源和数据格式',
+    rating: 7,
   }
 
 ]
