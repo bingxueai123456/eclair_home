@@ -291,6 +291,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: '一些市场商用软件的AI提示词',
     rating: 7,
+  },{
+    id: 31,
+    title: 'MCP生成图片',
+    url: 'https://github.com/mikeyny/ai-image-gen-mcp',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'MCP生成图片',
+    rating: 7,
   }
 
 ]
