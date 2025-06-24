@@ -283,6 +283,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'EasySpider 是一个基于 Python 的爬虫框架，支持多种数据源和数据格式',
     rating: 7,
+  },{
+    id: 30,
+    title: '一些市场商用软件的AI提示词',
+    url: 'https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: '一些市场商用软件的AI提示词',
+    rating: 7,
   }
 
 ]
