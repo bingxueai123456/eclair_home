@@ -299,6 +299,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'MCP生成图片',
     rating: 7,
+  },{
+    id: 32,
+    title: '中国外汇管理中心网站',
+    url: 'https://www.chinamoney.com.cn/chinese/index.html',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '中国外汇管理中心官网，外汇、债券、LPR',
+    rating: 7,
   }
 
 ]
