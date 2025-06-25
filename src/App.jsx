@@ -307,7 +307,35 @@ const initialLinks = [
     subCategory: '经济',
     description: '中国外汇管理中心官网，外汇、债券、LPR',
     rating: 7,
+  },{
+    id: 33,
+    title: 'Radix UI',
+    url: 'https://www.radix-ui.com/',
+    mainCategory: '研发',
+    subCategory: '前端',
+    description: 'Radix UI 是一个开源的 UI 组件库，基于 React 和 TypeScript 构建',
+    rating: 7,
+  }{
+    id: 34,
+    title: 'Tailwind CSS',
+    url: 'https://tailwindcss.com/',
+    mainCategory: '研发',
+    subCategory: '前端',
+    description: 'Tailwind CSS 是一个开源的 CSS 框架，基于 Tailwind CSS 构建',
+    rating: 7,
+  },{
+    id: 35,
+    title: 'Motion动画',
+    url: 'https://motion.dev/',
+    mainCategory: '研发',
+    subCategory: '前端',
+    description: 'Motion 是一个开源的动画库，基于 React 和 TypeScript 构建',
+    rating: 7,
+  },{
+
   }
+
+
 
 ]
 
