@@ -315,7 +315,7 @@ const initialLinks = [
     subCategory: '前端',
     description: 'Radix UI 是一个开源的 UI 组件库，基于 React 和 TypeScript 构建',
     rating: 7,
-  }{
+  },{
     id: 34,
     title: 'Tailwind CSS',
     url: 'https://tailwindcss.com/',
@@ -331,8 +331,6 @@ const initialLinks = [
     subCategory: '前端',
     description: 'Motion 是一个开源的动画库，基于 React 和 TypeScript 构建',
     rating: 7,
-  },{
-
   }
 
 
