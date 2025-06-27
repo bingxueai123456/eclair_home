@@ -339,6 +339,14 @@ const initialLinks = [
     subCategory: '前端',
     description: '用react制作动态视频',
     rating: 7,
+  },{
+    id: 37,
+    title: 'moocup',
+    url: 'https://moocup.jaydip.me/',
+    mainCategory: '研发',
+    subCategory: '前端',
+    description: 'moocup有渐变色背景，放入自己图片，进行拼接',
+    rating: 7,
   }
 
 
