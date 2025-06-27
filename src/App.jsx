@@ -331,6 +331,14 @@ const initialLinks = [
     subCategory: '前端',
     description: 'Motion 是一个开源的动画库，基于 React 和 TypeScript 构建',
     rating: 7,
+  },{
+    id: 36,
+    title: 'remotion',
+    url: 'https://github.com/remotion-dev/remotion',
+    mainCategory: '研发',
+    subCategory: '前端',
+    description: '用react制作动态视频',
+    rating: 7,
   }
 
 
