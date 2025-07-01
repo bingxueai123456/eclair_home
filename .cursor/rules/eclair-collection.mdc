@@ -1,0 +1,156 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Eclair Collection - 开发指南
+
+## 项目概述
+Eclair Collection 是一个现代化的个人内容聚合平台，集成网站收藏、YouTube订阅、RSS订阅、博客管理等功能。
+
+## 核心架构
+
+### 主应用入口
+- [main.jsx](mdc:src/main.jsx) - React应用的入口点，配置根组件渲染
+- [App.jsx](mdc:src/App.jsx) - 主应用组件，包含所有功能模块和布局
+- [App.css](mdc:src/App.css) - 全局样式文件，包含主题系统和所有组件样式
+
+### 核心功能Hooks
+- [useGlobalSearch.jsx](mdc:src/useGlobalSearch.jsx) - 全局搜索功能，支持跨平台内容搜索
+- [useYoutubeRssFeed.js](mdc:src/useYoutubeRssFeed.js) - YouTube RSS数据管理和缓存
+- [useRssManager.js](mdc:src/useRssManager.js) - RSS订阅源管理和解析
+
+### 配置和文档
+- [package.json](mdc:package.json) - 项目依赖和脚本配置
+- [vite.config.js](mdc:vite.config.js) - Vite构建工具配置
+- [README.md](mdc:README.md) - 项目文档和使用说明
+- [RSS_GUIDE.md](mdc:RSS_GUIDE.md) - RSS功能配置指南
+
+## 技术栈规范
+
+### React模式
+- 使用React 19 + Vite 6
+- 优先使用函数式组件和Hooks
+- 状态管理使用useState和自定义Hook
+- 避免类组件，保持代码现代化
+
+### 样式系统
+参考 [App.css](mdc:src/App.css) 的主题实现：
+- 使用CSS变量进行主题管理：`var(--primary-color)`
+- 支持明亮、暗黑、渐变三种主题
+- 玻璃拟态效果：`backdrop-filter: blur(10px)`
+- 响应式设计：移动端使用侧边栏抽屉式布局
+
+### 数据处理
+- RSS解析使用fast-xml-parser
+- 本地缓存使用localStorage
+- YouTube RSS：5分钟缓存
+- 通用RSS：30分钟缓存
+- 跨域请求使用corsproxy.io代理
+
+## 组件开发规范
+
+### 组件结构
+在 [App.jsx](mdc:src/App.jsx) 中，所有功能组件都定义在同一文件内：
+```javascript
+// 主题切换组件
+function ThemeToggle({ theme, setTheme }) { ... }
+
+// 搜索组件  
+function SearchComponent() { ... }
+
+// 侧边栏组件
+function Sidebar() { ... }
+
+// 内容区域组件
+function ContentArea() { ... }
+```
+
+### Hook开发模式
+参考 [useRssManager.js](mdc:src/useRssManager.js) 的实现：
+- 封装业务逻辑到自定义Hook
+- 返回数据和操作函数
+- 内置错误处理和缓存逻辑
+- 使用useEffect处理副作用
+
+## 功能模块配置
+
+### 网站收藏
+在 [App.jsx](mdc:src/App.jsx) 的 `initialLinks` 数组中配置：
+```javascript
+{
+  id: Number,           // 唯一ID
+  title: String,        // 网站标题
+  url: String,          // 网站URL
+  mainCategory: String, // 主分类
+  subCategory: String,  // 子分类
+  description: String,  // 描述信息
+  rating: Number,       // 1-7星评级
+  icon: FontAwesome     // 图标组件
+}
+```
+
+### RSS订阅源
+在 [useRssManager.js](mdc:src/useRssManager.js) 的 `RSS_SOURCES` 中配置：
+```javascript
+{
+  id: String,           // 唯一标识符
+  name: String,         // 显示名称
+  url: String,          // RSS feed URL
+  description: String   // 描述信息
+}
+```
+
+### YouTube频道
+在 [useYoutubeRssFeed.js](mdc:src/useYoutubeRssFeed.js) 的 `YOUTUBE_CHANNELS` 中配置频道ID
+
+### 博客文章
+在 [App.jsx](mdc:src/App.jsx) 的 `initialBlogs` 中配置，HTML文件放在 `public/html/` 目录
+
+## 开发最佳实践
+
+### 代码风格
+- 中文注释，英文变量名和函数名
+- 组件名使用PascalCase
+- 变量名使用camelCase
+- 常量使用UPPER_SNAKE_CASE
+
+### 错误处理
+- 网络请求失败要有降级处理
+- RSS解析错误显示友好提示
+- 缓存读取失败不影响功能
+- 使用console.warn()输出警告
+
+### 性能优化
+- 合理使用缓存机制
+- 避免不必要的重渲染
+- 长列表考虑虚拟滚动
+- 图片使用懒加载
+
+### 响应式设计
+- 桌面端：sidebar + main content布局
+- 平板端 (≤1024px)：调整间距和字体
+- 移动端 (≤768px)：侧边栏抽屉式，堆叠布局
+- 小屏 (≤480px)：进一步优化间距
+
+## 调试和开发
+
+### 启动开发服务器
+```bash
+npm run dev
+```
+访问：http://localhost:5173/ 或 http://localhost:5174/
+
+### 构建生产版本
+```bash
+npm run build
+```
+
+### 预览生产构建
+```bash
+npm run preview
+```
+
+## 核心理念
+保持代码的简洁性和用户体验的优雅性，记住项目的核心理念："想想你为什么活着"。
+

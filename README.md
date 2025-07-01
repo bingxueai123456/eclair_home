@@ -6,6 +6,7 @@
   <img src="https://img.shields.io/badge/FontAwesome-6+-339AF0?style=for-the-badge&logo=fontawesome&logoColor=white" alt="FontAwesome">
   <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3">
   <img src="https://img.shields.io/badge/YouTube-RSS-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="YouTube RSS">
+  <img src="https://img.shields.io/badge/RSS-Feed-FF6B35?style=for-the-badge&logo=rss&logoColor=white" alt="RSS Feed">
 </div>
 
 <p align="center">
@@ -14,7 +15,7 @@
 
 ## 📖 项目简介
 
-Eclair Collection 是一个集网站收藏、YouTube 订阅、博客管理于一体的现代化个人内容聚合平台。采用 Material Design 设计语言，支持多主题切换、全局搜索、响应式布局等特性，为用户提供优雅的内容管理和浏览体验。
+Eclair Collection 是一个集网站收藏、YouTube 订阅、RSS订阅、博客管理于一体的现代化个人内容聚合平台。采用 Material Design 设计语言，支持多主题切换、全局搜索、响应式布局等特性，为用户提供优雅的内容管理和浏览体验。
 
 ## ✨ 核心特性
 
@@ -40,6 +41,14 @@ Eclair Collection 是一个集网站收藏、YouTube 订阅、博客管理于一
 - **视频卡片展示** - 缩略图、标题、频道、发布时间一目了然
 - **跨域代理支持** - 使用 corsproxy.io 解决CORS问题
 
+#### 📡 RSS订阅聚合
+- **预设RSS源管理** - 代码中预设RSS源，支持扩展配置
+- **多格式RSS支持** - 支持RSS 2.0和Atom格式自动解析
+- **横向卡片布局** - 防止内容截断，优化阅读体验
+- **智能缓存机制** - 30分钟缓存，减少重复请求
+- **错误处理机制** - 优雅处理RSS源访问失败
+- **文章预览展示** - 标题、描述、发布时间完整显示
+
 #### 📝 博客集管理
 - **静态文章收集** - 支持本地HTML文章管理
 - **分类标签系统** - 多维度文章分类和标签
@@ -47,10 +56,10 @@ Eclair Collection 是一个集网站收藏、YouTube 订阅、博客管理于一
 - **快速访问链接** - 一键打开本地或外部文章
 
 #### 🔍 全局智能搜索
-- **跨平台搜索** - 同时搜索网站、博客、YouTube视频
+- **跨平台搜索** - 同时搜索网站、博客、YouTube视频、RSS文章
 - **模糊匹配算法** - 支持标题、描述、分类、标签等字段
 - **实时搜索结果** - 无需点击，输入即搜
-- **分类结果展示** - 网站、博客、视频结果分组显示
+- **分类结果展示** - 网站、博客、视频、RSS文章结果分组显示
 - **统计信息显示** - 显示各类型结果数量
 
 ### 🎯 用户体验
@@ -105,12 +114,13 @@ npm run preview
   - 搜索框（全局搜索）
   - 主题切换器（6种主题）
   - 视图切换器（网格/列表）
-  - 特殊菜单（YouTube订阅、博客集）
+  - 特殊菜单（YouTube订阅、RSS订阅、博客集）
   - 分类导航树（可折叠展开）
 
 - **右侧主内容区**: 
   - 网站收藏卡片
   - YouTube视频流
+  - RSS文章流
   - 博客文章列表
   - 全局搜索结果
 
@@ -188,6 +198,85 @@ const YOUTUBE_CHANNELS = [
 ]
 ```
 
+### 配置RSS订阅源
+
+#### 1. 添加RSS源
+在 `src/useRssManager.js` 的 `RSS_SOURCES` 数组中添加新的RSS源：
+
+```javascript
+const RSS_SOURCES = [
+  // 现有RSS源...
+  {
+    id: 'unique-id',        // 唯一标识符
+    name: '显示名称',        // 在界面上显示的名称
+    url: 'RSS链接',         // 必须是有效的RSS/Atom feed URL
+    description: '描述信息'  // 可选的描述信息
+  }
+]
+```
+
+#### 2. RSS源配置示例
+
+```javascript
+{
+  id: 'tech-blog',
+  name: '技术博客',
+  url: 'https://example.com/rss.xml',
+  description: '最新技术文章分享'
+},
+{
+  id: 'news-site',
+  name: '新闻网站',
+  url: 'https://news.example.com/feed',
+  description: '每日新闻更新'
+}
+```
+
+#### 3. 注意事项
+
+⚠️ **重要**: RSS URL必须是有效的RSS/Atom feed，不能是普通网页链接
+
+- ✅ 正确: `https://example.com/rss.xml`
+- ✅ 正确: `https://example.com/feed`
+- ✅ 正确: `https://example.com/atom.xml`
+- ❌ 错误: `https://example.com/index.html`
+
+#### 4. 常用RSS源推荐
+
+```javascript
+// 技术博客
+{
+  id: 'ruanyf-weekly',
+  name: '科技爱好者周刊',
+  url: 'https://feeds.feedburner.com/ruanyifeng',
+  description: '阮一峰的科技爱好者周刊'
+},
+
+// 新闻资讯
+{
+  id: 'sspai',
+  name: '少数派',
+  url: 'https://sspai.com/feed',
+  description: '少数派最新文章'
+},
+
+// GitHub项目
+{
+  id: 'github-project',
+  name: 'GitHub项目动态',
+  url: 'https://github.com/{user}/{repo}/releases.atom',
+  description: '项目发布动态'
+}
+```
+
+#### 5. RSS功能特性
+
+- **自动解析**: 支持RSS 2.0和Atom格式
+- **智能缓存**: 30分钟缓存机制
+- **错误处理**: 优雅处理访问失败的RSS源
+- **横向布局**: 防止长文本截断
+- **响应式设计**: 适配各种屏幕尺寸
+
 ### 添加博客文章
 
 在 `src/App.jsx` 的 `initialBlogs` 数组中添加：
@@ -218,10 +307,12 @@ eclair_home/
 │   ├── main.jsx           # 应用入口
 │   ├── useGlobalSearch.jsx # 全局搜索Hook
 │   ├── useYoutubeRssFeed.js # YouTube RSS Hook
+│   ├── useRssManager.js   # RSS订阅管理Hook
 │   └── assets/            # 静态资源
 ├── package.json           # 项目配置
 ├── vite.config.js         # Vite配置
 ├── eslint.config.js       # ESLint配置
+├── RSS_GUIDE.md           # RSS配置指南
 └── README.md              # 项目文档
 ```
 
@@ -256,8 +347,18 @@ eclair_home/
 - ✅ 发布时间排序
 - ✅ 一键观看跳转
 
+### RSS订阅聚合
+- ✅ 代码预设RSS源
+- ✅ 支持RSS 2.0和Atom格式
+- ✅ 自动缓存机制（30分钟）
+- ✅ 横向卡片布局
+- ✅ 文章完整预览
+- ✅ 错误状态处理
+- ✅ 响应式设计
+- ✅ 一键刷新功能
+
 ### 全局搜索引擎
-- ✅ 跨平台统一搜索
+- ✅ 跨平台统一搜索（网站+博客+YouTube+RSS）
 - ✅ 模糊匹配算法
 - ✅ 实时搜索建议
 - ✅ 分类结果展示
@@ -279,6 +380,8 @@ eclair_home/
 ## 🚧 开发计划
 
 ### 即将推出
+- [ ] RSS源动态添加功能
+- [ ] RSS文章收藏功能
 - [ ] 用户自定义主题
 - [ ] 导入/导出配置
 - [ ] 网站截图自动生成
@@ -312,11 +415,16 @@ eclair_home/
 
 **Eclair** - 想想你为什么活着
 
+## 📚 相关文档
+
+- **[RSS配置指南](RSS_GUIDE.md)** - 详细的RSS源配置教程和常见问题解答
+
 ## 🙏 致谢
 
 - [FontAwesome](https://fontawesome.com/) - 提供优秀的图标库
 - [Vite](https://vitejs.dev/) - 极速的构建工具
 - [React](https://reactjs.org/) - 强大的前端框架
+- [fast-xml-parser](https://github.com/NaturalIntelligence/fast-xml-parser) - 强大的XML解析库
 - [corsproxy.io](https://corsproxy.io/) - 跨域代理服务
 
 ---
