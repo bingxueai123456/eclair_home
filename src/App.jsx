@@ -347,8 +347,31 @@ const initialLinks = [
     subCategory: '前端',
     description: 'moocup有渐变色背景，放入自己图片，进行拼接',
     rating: 7,
+  },{
+    id: 38,
+    title: 'firecrawl',
+    url: 'https://github.com/mendableai/firecrawl',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'API工具，可将整个网站转换为适合大型语言模型的Markdown或结构化数据。它通过单一API实现网页抓取、爬取和提取功能，使用TypeScript开发',
+    rating: 7,
+  },{
+    id: 39,
+    title: 'paperless-ngx',
+    url: 'https://github.com/paperless-ngx/paperless-ngx',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: '高性能文档管理系统，支持扫描、索引和归档各类文档',
+    rating: 7,
+  },{
+    id:40,
+    title: 'OpenCut',
+    url: 'https://github.com/OpenCut-app/OpenCut',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'OpenCut 开源的视屏剪辑工具',
+    rating: 7,
   }
-
 
 
 ]
