@@ -371,6 +371,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'OpenCut 开源的视屏剪辑工具',
     rating: 7,
+  },{
+    id:41,
+    title: 'RSShub',
+    url: 'https://github.com/DIYgod/RSSHub',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'RSSHub 是一个开源的 RSS 生成器，支持多种网站',
+    rating: 7,
   }
 
 
