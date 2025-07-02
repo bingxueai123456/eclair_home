@@ -381,6 +381,22 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'RSSHub 是一个开源的 RSS 生成器，支持多种网站',
     rating: 7,
+  },{
+    id:42,  
+    title: 'lmarena 模型排行榜',
+    url: 'https://lmarena.ai/leaderboard',
+    mainCategory: '研发',
+    subCategory: 'AI',
+    description: 'lmarena 模型排行榜',
+    rating: 7,
+  },{
+    id:43,
+    title: 'SEAL LLM 模型排行榜',
+    url: 'https://scale.com/leaderboard',
+    mainCategory: '研发',
+    subCategory: 'AI',
+    description: 'SEAL LLM 模型排行榜',
+    rating: 7,
   }
 
 
