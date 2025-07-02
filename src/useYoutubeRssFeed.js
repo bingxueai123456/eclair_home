@@ -10,6 +10,7 @@ const YOUTUBE_CHANNELS = [
   'UC2ggjtuuWvxrHHHiaDH1dlQ',
   'UCPpdGTNbIKdiWgxCrbka4Zw',
   'UCrB7UFnkosBjAhOg3a9NdWw',
+  'UCXUPKJO5MZQN11PqgIvyuvQ',
 ]
 
 const getRssUrl = (channelId) => `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`
