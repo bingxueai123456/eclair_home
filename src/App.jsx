@@ -10,12 +10,14 @@ import {
   faFilePowerpoint,
   faFileText,
   faSync,
-  faSpinner
+  faSpinner,
+  faRss
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faCreativeCommonsNc, faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import './App.css'
 import useYoutubeRssFeed from './useYoutubeRssFeed'
+import useRssManager from './useRssManager'
 import { useGlobalSearch, SearchResults } from './useGlobalSearch'
 
 const initialLinks = [
@@ -496,6 +498,143 @@ const initialBlogs = [
   // 可以继续在这里添加更多博客文章
 ]
 
+// RSS订阅组件
+function RssFeeds({ 
+  rssFeeds, 
+  loading, 
+  error, 
+  lastFetch, 
+  onRefreshAll, 
+  onRefreshSingle 
+}) {
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return ''
+    try {
+      const date = new Date(dateStr)
+      const now = new Date()
+      const diffHours = Math.floor((now - date) / (1000 * 60 * 60))
+      
+      if (diffHours < 1) return '1小时内'
+      if (diffHours < 24) return `${diffHours}小时前`
+      if (diffHours < 48) return '1天前'
+      const diffDays = Math.floor(diffHours / 24)
+      if (diffDays < 7) return `${diffDays}天前`
+      return date.toLocaleDateString('zh-CN')
+    } catch (e) {
+      return dateStr
+    }
+  }
+
+  return (
+    <div className="rss-feeds-section">
+      <div className="rss-header">
+        <div className="rss-subs-title">
+          <h1>
+            <FontAwesomeIcon icon={faRss} />
+            RSS订阅
+          </h1>
+          <div className="rss-controls">
+            {lastFetch && (
+              <div className="last-update">
+                最后更新: {lastFetch}
+              </div>
+            )}
+            <button 
+              className="refresh-btn"
+              onClick={() => onRefreshAll(false)}
+              disabled={loading}
+            >
+              <FontAwesomeIcon icon={loading ? faSpinner : faSync} className={loading ? 'spinning' : ''} />
+              刷新
+            </button>
+            <button 
+              className="refresh-btn force"
+              onClick={() => onRefreshAll(true)}
+              disabled={loading}
+            >
+              <FontAwesomeIcon icon={faSync} />
+              强制刷新
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {loading && (
+        <div className="loading-message">
+          <FontAwesomeIcon icon={faSpinner} className="spinning" />
+          正在获取RSS内容...
+        </div>
+      )}
+
+      {error && (
+        <div className="error-message">
+          <FontAwesomeIcon icon={faSync} />
+          {error}
+        </div>
+      )}
+
+      <div className="rss-feeds-container">
+        {rssFeeds.map(feed => (
+          <div key={feed.id} className="rss-feed-section">
+            <div className="rss-feed-header">
+              <h2>{feed.name}</h2>
+              <div className="feed-actions">
+                <button 
+                  className="refresh-btn"
+                  onClick={() => onRefreshSingle(feed.id)}
+                  title="刷新此订阅"
+                  disabled={loading}
+                >
+                  <FontAwesomeIcon icon={faSync} />
+                </button>
+              </div>
+            </div>
+            
+            {feed.description && (
+              <p className="feed-description">{feed.description}</p>
+            )}
+            
+            {feed.error && (
+              <div className="feed-error">
+                <FontAwesomeIcon icon={faSync} />
+                获取失败: {feed.error}
+              </div>
+            )}
+
+            {feed.items && feed.items.length > 0 ? (
+              <div className="rss-items-row">
+                {feed.items.map((item, index) => (
+                  <div key={item.guid || index} className="rss-item-card">
+                    <div className="rss-item-content">
+                      <h3 className="rss-item-title">
+                        <a href={item.link} target="_blank" rel="noopener noreferrer">
+                          {item.title}
+                        </a>
+                      </h3>
+                      {item.description && (
+                        <p className="rss-item-description">
+                          {item.description.replace(/<[^>]*>/g, '').substring(0, 120)}
+                          {item.description.replace(/<[^>]*>/g, '').length > 120 ? '...' : ''}
+                        </p>
+                      )}
+                      {item.pubDate && (
+                        <div className="rss-item-date">{formatDate(item.pubDate)}</div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              !feed.error && <div className="feed-empty">暂无内容</div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function YoutubeSubs({ feeds, loading, error, lastFetch, onRefresh }) {
   // 时间格式化
   const formatDate = (dateStr) => {
@@ -683,6 +822,16 @@ function App() {
   
   // 获取YouTube数据
   const { feeds: youtubeFeeds, loading: youtubeLoading, error: youtubeError, lastFetch, refresh } = useYoutubeRssFeed()
+  
+  // RSS管理
+  const { 
+    rssFeeds, 
+    loading: rssLoading, 
+    error: rssError, 
+    lastFetch: rssLastFetch,
+    refreshAllFeeds, 
+    refreshSingleFeed 
+  } = useRssManager()
   
   // 使用全局搜索
   const searchResults = useGlobalSearch(searchTerm, links, initialBlogs, youtubeFeeds)
@@ -967,6 +1116,14 @@ function App() {
           </button>
           
           <button
+            className={`special-menu-btn rss ${activeMenu === 'rss' ? 'active' : ''}`}
+            onClick={() => setActiveMenu('rss')}
+          >
+            <FontAwesomeIcon icon={faRss} />
+            RSS订阅
+          </button>
+          
+          <button
             className={`special-menu-btn blog ${activeMenu === 'blog' ? 'active' : ''}`}
             onClick={() => setActiveMenu('blog')}
           >
@@ -1074,6 +1231,16 @@ function App() {
             error={youtubeError}
             lastFetch={lastFetch}
             onRefresh={refresh}
+          />
+        )}
+        {activeMenu === 'rss' && (
+          <RssFeeds 
+            rssFeeds={rssFeeds}
+            loading={rssLoading}
+            error={rssError}
+            lastFetch={rssLastFetch}
+            onRefreshAll={refreshAllFeeds}
+            onRefreshSingle={refreshSingleFeed}
           />
         )}
         {activeMenu === 'blog' && <BlogCollection />}

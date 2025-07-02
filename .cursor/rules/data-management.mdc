@@ -1,0 +1,353 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# 数据管理和API集成指南
+
+## 数据源架构
+
+### 核心数据管理Hook
+- [useRssManager.js](mdc:src/useRssManager.js) - RSS订阅源管理和解析
+- [useYoutubeRssFeed.js](mdc:src/useYoutubeRssFeed.js) - YouTube RSS数据管理
+- [useGlobalSearch.jsx](mdc:src/useGlobalSearch.jsx) - 跨平台搜索功能
+
+### 数据持久化
+所有数据管理基于localStorage进行本地缓存，支持离线访问和性能优化。
+
+## RSS数据管理
+
+### RSS源配置
+在 [useRssManager.js](mdc:src/useRssManager.js) 中的 `RSS_SOURCES` 数组：
+
+```javascript
+const RSS_SOURCES = [
+  {
+    id: 'ruanyifeng-weekly',
+    name: '科技爱好者周刊',
+    url: 'https://feeds.feedburner.com/ruanyifeng',
+    description: '阮一峰的科技爱好者周刊，分享科技新闻和编程资源'
+  },
+  // 更多RSS源...
+];
+```
+
+### RSS数据结构
+```javascript
+{
+  title: String,          // 文章标题
+  description: String,    // 文章描述/摘要
+  link: String,          // 文章链接
+  pubDate: String,       // 发布日期
+  creator: String,       // 作者（可选）
+  category: Array,       // 分类标签（可选）
+  guid: String          // 唯一标识符（可选）
+}
+```
+
+### RSS解析实现
+```javascript
+import { XMLParser } from 'fast-xml-parser';
+
+const parser = new XMLParser({
+  ignoreAttributes: false,
+  attributeNamePrefix: '@_'
+});
+
+// 支持RSS 2.0和Atom格式
+const parseRSSFeed = (xmlText) => {
+  const result = parser.parse(xmlText);
+  
+  // RSS 2.0格式
+  if (result.rss && result.rss.channel) {
+    return result.rss.channel.item || [];
+  }
+  
+  // Atom格式
+  if (result.feed && result.feed.entry) {
+    return result.feed.entry || [];
+  }
+  
+  return [];
+};
+```
+
+## YouTube数据管理
+
+### 频道配置
+在 [useYoutubeRssFeed.js](mdc:src/useYoutubeRssFeed.js) 中配置：
+
+```javascript
+const YOUTUBE_CHANNELS = [
+  'UCXZCJLdBC09xxGZ6gcdrc6A',  // 李永乐老师
+  'UCBcRF18a7Qf58cCRy5xuWwQ',  // TechWorld with Nana
+  // 更多频道ID...
+];
+```
+
+### RSS URL格式
+```javascript
+const getRSSUrl = (channelId) => 
+  `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+```
+
+### YouTube数据处理
+参考 [useYoutubeRssFeed.js](mdc:src/useYoutubeRssFeed.js) 中的实现：
+
+```javascript
+// 获取频道信息
+const getChannelInfo = async (channelId) => {
+  const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(rssUrl)}`;
+  const response = await fetch(proxyUrl);
+  // 解析和处理...
+};
+
+// 合并所有频道数据
+const mergeAllChannelData = (allChannelsData) => {
+  return allChannelsData
+    .flat()
+    .filter(video => video && video.title)
+    .sort((a, b) => new Date(b.published) - new Date(a.published));
+};
+```
+
+## 缓存策略
+
+### 缓存配置
+参考各个Hook中的缓存实现：
+
+```javascript
+// YouTube RSS: 5分钟缓存
+const CACHE_DURATION_YOUTUBE = 5 * 60 * 1000;
+
+// 通用RSS: 30分钟缓存
+const CACHE_DURATION_RSS = 30 * 60 * 1000;
+
+// 缓存键名格式
+const getCacheKey = (type, identifier) => `${type}-${identifier}`;
+```
+
+### 缓存实现模式
+```javascript
+const getCachedData = (cacheKey, duration) => {
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const { data, timestamp } = JSON.parse(cached);
+      if (Date.now() - timestamp < duration) {
+        return data;
+      }
+    }
+  } catch (error) {
+    console.warn('读取缓存失败:', error);
+  }
+  return null;
+};
+
+const setCachedData = (cacheKey, data) => {
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify({
+      data,
+      timestamp: Date.now()
+    }));
+  } catch (error) {
+    console.warn('保存缓存失败:', error);
+  }
+};
+```
+
+## 跨域处理
+
+### CORS代理
+使用corsproxy.io服务解决跨域问题：
+
+```javascript
+const PROXY_URL = 'https://corsproxy.io/?';
+
+const fetchWithProxy = async (url) => {
+  const proxyUrl = `${PROXY_URL}${encodeURIComponent(url)}`;
+  return fetch(proxyUrl);
+};
+```
+
+### 错误处理
+```javascript
+const fetchRSSData = async (url) => {
+  try {
+    const response = await fetchWithProxy(url);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return await response.text();
+  } catch (error) {
+    console.error('RSS获取失败:', error);
+    return null;
+  }
+};
+```
+
+## 搜索功能实现
+
+### 全局搜索架构
+参考 [useGlobalSearch.jsx](mdc:src/useGlobalSearch.jsx) 的实现：
+
+```javascript
+const searchAcrossData = (searchTerm, allData) => {
+  const lowerSearchTerm = searchTerm.toLowerCase();
+  
+  return {
+    websites: filterWebsites(allData.websites, lowerSearchTerm),
+    blogs: filterBlogs(allData.blogs, lowerSearchTerm),
+    youtube: filterYouTube(allData.youtube, lowerSearchTerm),
+    rss: filterRSS(allData.rss, lowerSearchTerm)
+  };
+};
+```
+
+### 搜索过滤逻辑
+```javascript
+const searchInFields = (item, searchTerm, fields) => {
+  return fields.some(field => {
+    const value = item[field];
+    if (typeof value === 'string') {
+      return value.toLowerCase().includes(searchTerm);
+    }
+    if (Array.isArray(value)) {
+      return value.some(v => 
+        typeof v === 'string' && v.toLowerCase().includes(searchTerm)
+      );
+    }
+    return false;
+  });
+};
+```
+
+## 状态管理模式
+
+### Hook状态结构
+```javascript
+const [state, setState] = useState({
+  data: [],           // 主要数据
+  loading: false,     // 加载状态
+  error: null,        // 错误信息
+  lastFetch: null     // 最后获取时间
+});
+```
+
+### 异步状态更新
+```javascript
+const fetchData = useCallback(async () => {
+  setState(prev => ({ ...prev, loading: true, error: null }));
+  
+  try {
+    const data = await fetchRSSData();
+    setState(prev => ({
+      ...prev,
+      data,
+      loading: false,
+      lastFetch: new Date()
+    }));
+  } catch (error) {
+    setState(prev => ({
+      ...prev,
+      loading: false,
+      error: error.message
+    }));
+  }
+}, []);
+```
+
+## 性能优化策略
+
+### 数据获取优化
+```javascript
+// 防抖处理搜索
+const debouncedSearch = useMemo(
+  () => debounce(performSearch, 300),
+  [performSearch]
+);
+
+// 避免重复请求
+const fetchRef = useRef(false);
+if (!fetchRef.current) {
+  fetchRef.current = true;
+  fetchData();
+}
+```
+
+### 内存管理
+```javascript
+// 清理订阅和定时器
+useEffect(() => {
+  return () => {
+    // 清理工作
+  };
+}, []);
+
+// 限制缓存大小
+const cleanOldCache = () => {
+  const cacheKeys = Object.keys(localStorage);
+  const expiredKeys = cacheKeys.filter(key => {
+    // 检查过期缓存并清理
+  });
+  expiredKeys.forEach(key => localStorage.removeItem(key));
+};
+```
+
+## 错误处理和降级
+
+### 网络错误处理
+```javascript
+const handleNetworkError = (error) => {
+  console.warn('网络请求失败，尝试使用缓存数据:', error);
+  
+  // 尝试加载缓存数据
+  const cachedData = getCachedData(cacheKey, Infinity);
+  if (cachedData) {
+    return cachedData;
+  }
+  
+  // 返回空数据避免崩溃
+  return [];
+};
+```
+
+### 数据解析错误
+```javascript
+const safeParseXML = (xmlText) => {
+  try {
+    return parser.parse(xmlText);
+  } catch (error) {
+    console.error('XML解析失败:', error);
+    return { items: [] };
+  }
+};
+```
+
+## 开发调试
+
+### 数据调试工具
+```javascript
+// 在浏览器控制台中检查缓存
+window.debugCache = {
+  list: () => Object.keys(localStorage),
+  get: (key) => JSON.parse(localStorage.getItem(key)),
+  clear: (pattern) => {
+    Object.keys(localStorage)
+      .filter(key => key.includes(pattern))
+      .forEach(key => localStorage.removeItem(key));
+  }
+};
+```
+
+### 开发环境配置
+在开发模式下启用详细日志：
+```javascript
+const isDev = process.env.NODE_ENV === 'development';
+
+const log = (message, data) => {
+  if (isDev) {
+    console.log(`[RSS] ${message}`, data);
+  }
+};
+```
