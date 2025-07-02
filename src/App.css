@@ -1934,6 +1934,43 @@ body {
   background: #1557b0;
 }
 
+/* RSS items垂直布局 */
+.rss-items-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 600px;
+  overflow-y: auto;
+  padding: 8px 0;
+  scroll-behavior: smooth;
+}
+
+.rss-items-column::-webkit-scrollbar {
+  width: 8px;
+}
+
+.rss-items-column::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.rss-items-column::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+}
+
+.rss-items-column::-webkit-scrollbar-thumb:hover {
+  background: #1557b0;
+}
+
+/* 垂直布局下的RSS卡片样式调整 */
+.rss-items-column .rss-item-card {
+  width: 100%;
+  min-width: unset;
+  max-width: unset;
+  flex-shrink: 0;
+}
+
 .rss-item-card {
   min-width: 320px;
   max-width: 400px;

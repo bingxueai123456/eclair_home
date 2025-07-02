@@ -16,6 +16,12 @@ const RSS_SOURCES = [
     url: 'https://feeds.feedburner.com/ruanyifeng',
     description: '阮一峰的科技爱好者周刊'
   },
+  {
+    id: 'github-trending',
+    name: 'GitHub Trending',
+    url: 'https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml',
+    description: 'GitHub Trending'
+  },
   
   // 要添加新的RSS源，在这里按照相同格式添加即可：
   // {

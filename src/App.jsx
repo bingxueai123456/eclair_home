@@ -14,7 +14,7 @@ import {
   faRss
 } from '@fortawesome/free-solid-svg-icons'
 
-import { faCreativeCommonsNc, faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons'
+import { faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons'
 import './App.css'
 import useYoutubeRssFeed from './useYoutubeRssFeed'
 import useRssManager from './useRssManager'
@@ -521,7 +521,7 @@ function RssFeeds({
       const diffDays = Math.floor(diffHours / 24)
       if (diffDays < 7) return `${diffDays}天前`
       return date.toLocaleDateString('zh-CN')
-    } catch (e) {
+    } catch {
       return dateStr
     }
   }
@@ -603,7 +603,7 @@ function RssFeeds({
             )}
 
             {feed.items && feed.items.length > 0 ? (
-              <div className="rss-items-row">
+              <div className="rss-items-column">
                 {feed.items.map((item, index) => (
                   <div key={item.guid || index} className="rss-item-card">
                     <div className="rss-item-content">
@@ -919,7 +919,7 @@ function App() {
   }
 
   // 处理搜索结果项点击
-  const handleSearchItemClick = (type, item) => {
+  const handleSearchItemClick = (type) => {
     setActiveMenu(type)
     setSearchTerm('') // 清除搜索词
     setIsMobileMenuOpen(false)
