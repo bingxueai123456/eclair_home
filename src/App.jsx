@@ -397,6 +397,22 @@ const initialLinks = [
     subCategory: 'AI',
     description: 'SEAL LLM 模型排行榜',
     rating: 7,
+  },{
+    id:44,
+    title: 'ntfy 推送',
+    url: 'https://github.com/binwiederhier/ntfy?tab=readme-ov-file',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'ntfy 推送消息到手机，电脑',
+    rating: 7,
+  },{
+    id:45,
+    title: 'nginx-proxy-manager',
+    url: 'https://github.com/NginxProxyManager/nginx-proxy-manager',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'nginx配置的可视化界面',
+    rating: 7,
   }
 
 
