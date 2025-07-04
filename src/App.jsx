@@ -371,7 +371,7 @@ const initialLinks = [
     url: 'https://github.com/OpenCut-app/OpenCut',
     mainCategory: 'github',
     subCategory: '工具类',
-    description: 'OpenCut 开源的视屏剪辑工具',
+    description: 'OpenCut 开源的视频剪辑工具',
     rating: 7,
   },{
     id:41,
