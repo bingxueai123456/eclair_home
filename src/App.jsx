@@ -413,6 +413,22 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'nginx配置的可视化界面',
     rating: 7,
+  },{
+    id:46,
+    title: '动手学习llm',
+    url: 'https://github.com/echonoshy/cgft-llm',
+    mainCategory: '研发',
+    subCategory: 'AI',
+    description: '动手学习大模型LLM',
+    rating: 7,
+  },{
+    id:47,
+    title: '终极学习研发构建自己的XXX',
+    url: 'https://github.com/codecrafters-io/build-your-own-x',
+    mainCategory: '研发',
+    subCategory: '其他',
+    description: '终极学习研发构建自己的XXX，学习各种研发知识',
+    rating: 7,
   }
 
 
