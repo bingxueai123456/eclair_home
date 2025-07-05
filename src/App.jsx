@@ -429,6 +429,14 @@ const initialLinks = [
     subCategory: '其他',
     description: '终极学习研发构建自己的XXX，学习各种研发知识',
     rating: 7,
+  },{
+    id:48,
+    title: 'go 爬虫',
+    url: 'https://github.com/gocolly/colly',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'go 爬虫框架',
+    rating: 7,
   }
 
 
