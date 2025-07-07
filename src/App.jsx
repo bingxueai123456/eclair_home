@@ -429,6 +429,38 @@ const initialLinks = [
     subCategory: '其他',
     description: '终极学习研发构建自己的XXX，学习各种研发知识',
     rating: 7,
+  },{
+    id:48,
+    title: 'keycheck 快捷键',
+    url: 'https://keycheck.dev/',
+    mainCategory: '研发',
+    subCategory: '其他',
+    description: '查看系统和很多APP的快捷键',
+    rating: 7,
+  },{
+    id:49,
+    title: 'FossFLOW 网络画图工具',
+    url: 'https://github.com/stan-smith/FossFLOW?tab=readme-ov-file',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'FossFLOW 网络画图工具',
+    rating: 7,
+  },{
+    id:50,
+    title: 'wr.do',
+    url: 'https://wr.do/dashboard',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: '一个自搭建的域名服务平台，可以基于域名创建子域名、短链接、邮件地址，并提供 API 接口',
+    rating: 7,
+  },{
+    id:51,
+    title: 'traffic.cv',
+    url: 'https://traffic.cv/',
+    mainCategory: '研发',
+    subCategory: '其他',
+    description: '免费的网站流量信息查询工具',
+    rating: 7,
   }
 
 
