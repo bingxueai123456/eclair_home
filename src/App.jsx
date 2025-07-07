@@ -469,6 +469,14 @@ const initialLinks = [
     subCategory: '其他',
     description: '免费的网站流量信息查询工具',
     rating: 7,
+  }, {
+    id:53,
+    title: '国家外汇统计局',
+    url: 'https://www.safe.gov.cn/safe/index.html',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '国家外汇统计局',
+    rating: 7,
   }
 
 
