@@ -371,7 +371,7 @@ const initialLinks = [
     url: 'https://github.com/OpenCut-app/OpenCut',
     mainCategory: 'github',
     subCategory: '工具类',
-    description: 'OpenCut 开源的视屏剪辑工具',
+    description: 'OpenCut 开源的视频剪辑工具',
     rating: 7,
   },{
     id:41,
@@ -431,6 +431,14 @@ const initialLinks = [
     rating: 7,
   },{
     id:48,
+    title: 'go 爬虫',
+    url: 'https://github.com/gocolly/colly',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'go 爬虫框架',
+    rating: 7,
+  },{
+    id:49,
     title: 'keycheck 快捷键',
     url: 'https://keycheck.dev/',
     mainCategory: '研发',
@@ -438,7 +446,7 @@ const initialLinks = [
     description: '查看系统和很多APP的快捷键',
     rating: 7,
   },{
-    id:49,
+    id:50,
     title: 'FossFLOW 网络画图工具',
     url: 'https://github.com/stan-smith/FossFLOW?tab=readme-ov-file',
     mainCategory: 'github',
@@ -446,7 +454,7 @@ const initialLinks = [
     description: 'FossFLOW 网络画图工具',
     rating: 7,
   },{
-    id:50,
+    id:51,
     title: 'wr.do',
     url: 'https://wr.do/dashboard',
     mainCategory: 'github',
@@ -454,7 +462,7 @@ const initialLinks = [
     description: '一个自搭建的域名服务平台，可以基于域名创建子域名、短链接、邮件地址，并提供 API 接口',
     rating: 7,
   },{
-    id:51,
+    id:52,
     title: 'traffic.cv',
     url: 'https://traffic.cv/',
     mainCategory: '研发',
