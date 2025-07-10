@@ -469,6 +469,14 @@ const initialLinks = [
     subCategory: '其他',
     description: '免费的网站流量信息查询工具',
     rating: 7,
+  },{
+    id:53,
+    title: 'genai-toolbox',
+    url: 'https://github.com/googleapis/genai-toolbox',
+    mainCategory: '研发',
+    subCategory: 'AI',
+    description: 'genai-toolbox 是一个开源的MCP服务器，操作数据库',
+    rating: 7,
   }
 
 
