@@ -484,6 +484,14 @@ const initialLinks = [
     subCategory: '经济',
     description: '国家外汇统计局',
     rating: 7,
+  },{
+    id:55,
+    title: 'strapi',
+    url: 'https://github.com/strapi/strapi',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'strapi 是一个开源的CMS系统，可以快速搭建网站',
+    rating: 7,
   }
 
 
