@@ -476,6 +476,13 @@ const initialLinks = [
     mainCategory: '研发',
     subCategory: 'AI',
     description: 'genai-toolbox 是一个开源的MCP服务器，操作数据库',
+  }, {
+    id:54,
+    title: '国家外汇统计局',
+    url: 'https://www.safe.gov.cn/safe/index.html',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '国家外汇统计局',
     rating: 7,
   }
 
