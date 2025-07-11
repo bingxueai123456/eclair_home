@@ -605,6 +605,14 @@ const initialBlogs = [
     category: '经济分析',
     date: '2024-01-15',
     tags: ['经济', '美元', '全球化']
+  },{
+    id: 2,
+    title: 'Mybatis批处理与SQL预编译',
+    url: '/html/Mybatis批处理与SQL预编译.html',
+    description: '分析Mybatis批处理与SQL预编译',
+    category: '数据库',
+    date: '2025-07-11',
+    tags: ['数据库', 'Mybatis', 'SQL']
   }
   // 可以继续在这里添加更多博客文章
 ]
