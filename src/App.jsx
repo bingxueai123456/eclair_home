@@ -508,6 +508,14 @@ const initialLinks = [
     subCategory: 'AI',
     description: '免费Ai文字转语音',
     rating: 7,
+  },{
+    id:59,
+    title: '4种颜色的调色板',
+    url: 'https://www.iamsajid.com/colors/',
+    mainCategory: '研发',
+    subCategory: '开发工具',
+    description: '4种颜色的调色板',
+    rating: 7,
   }
 
 
