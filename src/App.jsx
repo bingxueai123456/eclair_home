@@ -492,6 +492,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'strapi 是一个开源的CMS系统，可以快速搭建网站',
     rating: 7,
+  },{
+    id: 57,
+    title: '拼图工具',
+    url: 'https://img.ops-coffee.cn/zh/#philosophy',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: '一款免费拼图工具',
+    rating: 7,
   }
 
 
