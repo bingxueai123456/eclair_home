@@ -500,6 +500,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: '一款免费拼图工具',
     rating: 7,
+  },{
+    id:58,
+    title: '免费Ai文字转语音',
+    url: 'https://www.ttsomni.com/zh',
+    mainCategory: '研发',
+    subCategory: 'AI',
+    description: '免费Ai文字转语音',
+    rating: 7,
   }
 
 
