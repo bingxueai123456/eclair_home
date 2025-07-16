@@ -516,6 +516,14 @@ const initialLinks = [
     subCategory: '开发工具',
     description: '4种颜色的调色板',
     rating: 7,
+  },{
+    id:60,
+    title: 'json生成图表',
+    url: 'https://jsoncrack.com/editor',
+    mainCategory: '研发',
+    subCategory: '开发工具',
+    description: '把json，csv生成图表',
+    rating: 7,
   }
 
 
