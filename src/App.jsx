@@ -645,6 +645,14 @@ const initialBlogs = [
     category: '数据库',
     date: '2025-07-11',
     tags: ['数据库', 'Mybatis', 'SQL']
+  },{
+    id: 3,
+    title: '三大经济指标解读.html',
+    url: '/html/三大经济指标解读.html',
+    description: '三大经济指标解读',
+    category: '经济分析',
+    date: '2025-07-11',
+    tags: ['经济', '指标', '解读']
   }
   // 可以继续在这里添加更多博客文章
 ]
