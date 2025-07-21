@@ -533,6 +533,14 @@ const initialLinks = [
     description: 'tcpviz 是一个开源的TCP网络可视化工具，可以可视化TCP网络流量,可以把PCAP协议转成可视化图表',
     rating: 7,
 
+  },{
+    id:62,
+    title: 'arxiv论文',
+    url: 'https://arxiv.org/',
+    mainCategory: '新闻/周刊',
+    subCategory: '科技',
+    description: '开放获取（Open Access）的预印本论文仓库',
+    rating: 7,
   }
 
 
