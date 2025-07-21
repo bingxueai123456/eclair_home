@@ -541,6 +541,14 @@ const initialLinks = [
     subCategory: '科技',
     description: '开放获取（Open Access）的预印本论文仓库',
     rating: 7,
+  },{
+    id:63,
+    title: 'arxiv的AI筛选和总结',
+    url: 'https://dw-dengwei.github.io/daily-arXiv-ai-enhanced/',
+    mainCategory: '新闻/周刊',
+    subCategory: '科技',
+    description: 'AI论文',
+    rating: 7,
   }
 
 
