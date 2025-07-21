@@ -662,6 +662,14 @@ const initialBlogs = [
     category: '经济分析',
     date: '2025-07-11',
     tags: ['经济', '指标', '解读']
+  },{
+    id: 4,
+    title: '全球地图服务对比.html',
+    url: '/html/全球地图服务对比.html',
+    description: '全球地图服务对比',
+    category: '地图服务',
+    date: '2025-07-11',
+    tags: ['地图服务', '对比']
   }
   // 可以继续在这里添加更多博客文章
 ]
