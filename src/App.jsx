@@ -543,11 +543,11 @@ const initialLinks = [
     rating: 7,
   },{
     id:63,
-    title: 'arxiv的AI筛选和总结',
-    url: 'https://dw-dengwei.github.io/daily-arXiv-ai-enhanced/',
-    mainCategory: '新闻/周刊',
-    subCategory: '科技',
-    description: 'AI论文',
+    title: 'Aiweb爬虫',
+    url: 'https://github.com/unclecode/crawl4ai',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'AIweb爬虫提供速度超快、AI 就绪的 Web 爬取功能，专为 LLM、AI 代理和数据管道量身定制',
     rating: 7,
   }
 
