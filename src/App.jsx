@@ -549,6 +549,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'AIweb爬虫提供速度超快、AI 就绪的 Web 爬取功能，专为 LLM、AI 代理和数据管道量身定制',
     rating: 7,
+  },{
+    id:64,
+    title: 'UI组件',
+    url: 'https://uiverse.io/elements',
+    mainCategory: '研发',
+    subCategory: '前端',
+    description: 'UI组件',
+    rating: 7,
   }
 
 
