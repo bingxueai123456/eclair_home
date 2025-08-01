@@ -565,6 +565,22 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'ansible-ui 一个基于ansible的管理界面，方便小白使用',
     rating: 7,
+  },{
+    id:66,
+    title: 'ponghub',
+    url: 'https://github.com/WCY-dt/ponghub?tab=readme-ov-file',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: '一个开源的服务监控平台，通过 GitHub Actions 去监控服务是否正常在线',
+    rating: 7,
+  },{
+    id:67,
+    title: '技能人才评价工作网',
+    url: 'https://www.osta.org.cn/index.html',
+    mainCategory: '新闻/周刊',
+    subCategory: '科技',
+    description: '技能人才职业资格证书查询',
+    rating: 7,
   }
 
 
