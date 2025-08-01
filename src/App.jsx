@@ -557,6 +557,14 @@ const initialLinks = [
     subCategory: '前端',
     description: 'UI组件',
     rating: 7,
+  },{
+    id:65,
+    title: 'ansible-ui',
+    url: 'https://github.com/sky22333/ansible-ui',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'ansible-ui 一个基于ansible的管理界面，方便小白使用',
+    rating: 7,
   }
 
 
