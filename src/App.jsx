@@ -581,6 +581,14 @@ const initialLinks = [
     subCategory: '科技',
     description: '技能人才职业资格证书查询',
     rating: 7,
+  },{
+    id:68,
+    title: '中国债券信息网',
+    url: 'https://www.chinabond.com.cn/',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '中国债券信息网，查询债券信息',
+    rating: 7,
   }
 
 
