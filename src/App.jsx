@@ -589,6 +589,14 @@ const initialLinks = [
     subCategory: '经济',
     description: '中国债券信息网，查询债券信息',
     rating: 7,
+  },{
+    id:69,
+    title: '颜色生成器',
+    url: 'https://kigen.design/color',
+    mainCategory: '研发',
+    subCategory: '开发工具',
+    description: '颜色生成器',
+    rating: 7,
   }
 
 
