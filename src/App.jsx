@@ -597,6 +597,14 @@ const initialLinks = [
     subCategory: '开发工具',
     description: '颜色生成器',
     rating: 7,
+  },{
+    id:70,
+    title: 'openstatus 状态监控',
+    url: 'https://github.com/openstatusHQ/openstatus',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'openstatus 页面和API状态监控',
+    rating: 7,
   }
 
 
