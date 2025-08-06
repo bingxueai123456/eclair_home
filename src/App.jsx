@@ -605,6 +605,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'openstatus 页面和API状态监控',
     rating: 7,
+  },{
+    id:71,
+    title: 'coddy学习编程',
+    url: 'https://coddy.tech/onboard',
+    mainCategory: '研发',
+    subCategory: '开发工具',
+    description: 'coddy学习编程',
+    rating: 7,
   }
 
 
