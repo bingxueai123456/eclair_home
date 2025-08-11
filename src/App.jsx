@@ -613,6 +613,14 @@ const initialLinks = [
     subCategory: '开发工具',
     description: 'coddy学习编程',
     rating: 7,
+  },{
+    id:72,
+    title: '天天基金网',
+    url: 'https://www.1234567.com.cn/',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '天天基金网，查询基金信息',
+    rating: 7,
   }
 
 
