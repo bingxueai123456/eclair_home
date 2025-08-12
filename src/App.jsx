@@ -621,7 +621,16 @@ const initialLinks = [
     subCategory: '经济',
     description: '天天基金网，查询基金信息',
     rating: 7,
+  },{
+    id:73,
+    title: 'LiYing照片处理工具',
+    url: 'https://github.com/aoguai/LiYing',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'LiYing 是一套适用于自动化完成一般照相馆后期证件照处理流程的照片自动处理的程序。',
+    rating: 7,
   }
+
 
 
 ]
