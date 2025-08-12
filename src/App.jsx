@@ -629,6 +629,30 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'LiYing 是一套适用于自动化完成一般照相馆后期证件照处理流程的照片自动处理的程序。',
     rating: 7,
+  },{
+    id:74,
+    title: 'Canary Tokens（看门狗令牌）',
+    url: 'https://canarytokens.org/nest/',
+    mainCategory: '研发',
+    subCategory: '安全',
+    description: '让你在系统、文件、文档或网站中植入“诱饵”元素，当有人触碰它们时就会触发警报，从而帮助你尽早发现潜在的入侵行为。',
+    rating: 7,
+  },{
+    id:75,
+    title: 'pixel-motion',
+    url: 'https://pixel-motion.yysuni.com/',
+    mainCategory: '研发',
+    subCategory: '开发工具',
+    description: '在线的像素图作图工具，可以同屏制作多个动画帧',
+    rating: 7,
+  },{
+    id:76,
+    title: '数学手册计算器',
+    url: 'https://drhuang.com/chinese/science/mathematics/software/',
+    mainCategory: '研发',
+    subCategory: '其他',
+    description: '一个在线数学工具，包括数学手册、计算器、数学图形绘制等功能',
+    rating: 7,
   }
 
 
