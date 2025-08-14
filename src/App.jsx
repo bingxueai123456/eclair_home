@@ -653,6 +653,14 @@ const initialLinks = [
     subCategory: '其他',
     description: '一个在线数学工具，包括数学手册、计算器、数学图形绘制等功能',
     rating: 7,
+  },{
+    id:77,
+    title: 'mkcert',
+    url: 'https://github.com/FiloSottile/mkcert',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'mkcert 是一个用于生成本地开发环境的 SSL 证书的工具',
+    rating: 7,
   }
 
 
