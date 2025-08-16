@@ -661,6 +661,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'mkcert 是一个用于生成本地开发环境的 SSL 证书的工具',
     rating: 7,
+  },{
+    id:78,
+    title: 'awesome-llm-apps',
+    url: 'https://github.com/Shubhamsaboo/awesome-llm-apps?tab=readme-ov-file',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'awesome-llm-apps 是一个收集了各种LLM应用的仓库',
+    rating: 7,
   }
 
 
