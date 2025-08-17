@@ -669,6 +669,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'awesome-llm-apps 是一个收集了各种LLM应用的仓库',
     rating: 7,
+  },{
+    id:79,
+    title: '东方财富网',
+    url: 'https://www.eastmoney.com/default.html',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '东方财富网，查询股票信息，基金信息',
+    rating: 7,
   }
 
 
