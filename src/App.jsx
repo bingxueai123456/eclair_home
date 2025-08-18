@@ -677,6 +677,22 @@ const initialLinks = [
     subCategory: '经济',
     description: '东方财富网，查询股票信息，基金信息',
     rating: 7,
+  }, {
+    id:80,
+    title: 'ai-goofish-monitor咸鱼监控',
+    url: 'https://github.com/dingyufei615/ai-goofish-monitor',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'ai-goofish-monitor 是一个咸鱼监控工具，可以监控咸鱼上的商品信息',
+    rating: 7,
+  },{
+    id:81,
+    title: 'toBeBetterJavaer 学习Java',
+    url: 'https://github.com/itwanger/toBeBetterJavaer?tab=readme-ov-file',
+    mainCategory: '研发',
+    subCategory: '后端',
+    description: 'toBeBetterJavaer 是一个学习Java的仓库，包括Java基础、Java并发、Java虚拟机、Java性能优化、Java面试题等',
+    rating: 7,
   }
 
 
