@@ -693,6 +693,14 @@ const initialLinks = [
     subCategory: '后端',
     description: 'toBeBetterJavaer 是一个学习Java的仓库，包括Java基础、Java并发、Java虚拟机、Java性能优化、Java面试题等',
     rating: 7,
+  },{
+    id:82,
+    title: '60s-api',
+    url: 'https://docs.60s-api.viki.moe/',
+    mainCategory: '研发',
+    subCategory: '开发工具',
+    description: '60s API 是一系列 高质量、开源、可靠、全球 CDN 加速 的开放 API 集合。可以调用很多有用工具',
+    rating: 7,
   }
 
 
