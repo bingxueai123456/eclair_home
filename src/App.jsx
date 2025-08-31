@@ -701,6 +701,14 @@ const initialLinks = [
     subCategory: '开发工具',
     description: '60s API 是一系列 高质量、开源、可靠、全球 CDN 加速 的开放 API 集合。可以调用很多有用工具',
     rating: 7,
+  },{
+    id:83,
+    title: '日志分析工具',
+    url: 'https://github.com/control-theory/gonzo',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: '日志分析工具，对日志进行分类总结',
+    rating: 7,
   }
 
 
