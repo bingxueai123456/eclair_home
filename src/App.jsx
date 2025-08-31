@@ -709,7 +709,16 @@ const initialLinks = [
     subCategory: '工具类',
     description: '日志分析工具，对日志进行分类总结',
     rating: 7,
+  },{
+    id:84,
+    title: '云端串口调试工具',
+    url: 'https://serial.xywml.com/',
+    mainCategory: '研发',
+    subCategory: '开发工具',
+    description: '云端串口调试工具',
+    rating: 7,
   }
+
 
 
 
