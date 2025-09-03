@@ -725,7 +725,40 @@ const initialLinks = [
     subCategory: '工具类',
     description: '把任意 GitHub 仓库，变成一个 Wiki，详细解释代码运行过程，阅读代码的好帮手',
     rating: 7,
+  },{
+    id:86,
+    title: 'linux 的网络分析工具',
+    url: 'https://github.com/pythops/oryx',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'linux 的网络分析工具',
+    rating: 7,
+  },{
+    id:87,
+    title: 'fred',
+    url: 'https://fred.stlouisfed.org',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: 'fred 是一个开源的金融数据工具，可以查询金融数据',
+    rating: 7,
+  },{
+    id:88,
+    title: 'yahoo金融',
+    url: 'https://finance.yahoo.com',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: 'yahoo金融，可以查询金融数据',
+    rating: 7,
+  },{
+    id:89,
+    title: 'tradingeconomics',
+    url: 'https://zh.tradingeconomics.com/',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: 'tradingeconomics，可以查询金融数据',
+    rating: 7,
   }
+
   
 
 
