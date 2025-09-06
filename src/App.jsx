@@ -757,6 +757,22 @@ const initialLinks = [
     subCategory: '经济',
     description: 'tradingeconomics，可以查询金融数据',
     rating: 7,
+  },{
+    id:90,
+    title: 'tinyauth',
+    url: 'https://github.com/steveiliop56/tinyauth',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: '为任何 Web 应用或服务一键添加登录界面或 OAuth 登录（Google、GitHub 等），无需修改现有代码，可无缝集成到 Traefik、Caddy、Nginx 等主流反向代理，极大简化了安全登录的实现流程。',
+    rating: 7,
+  },{
+    id:91,
+    title: 'storymotion',
+    url: 'https://storymotion.video/',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'storymotion，通过excaldraw可以制作视频',
+    rating: 7,
   }
 
   
