@@ -767,7 +767,7 @@ const initialLinks = [
     rating: 7,
   },{
     id:91,
-    title: 'storymotion',
+    title: 'storymotion动画',
     url: 'https://storymotion.video/',
     mainCategory: 'github',
     subCategory: '工具类',
