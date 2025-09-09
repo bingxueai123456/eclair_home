@@ -914,6 +914,14 @@ const initialBlogs = [
     category: '地图服务',
     date: '2025-07-11',
     tags: ['地图服务', '对比']
+  },{
+    id: 5,
+    title: '成语',
+    url: '/html/成语.html',
+    description: '成语',
+    category: '成语',
+    date: '2025-07-11',
+    tags: ['成语', '解释']
   }
   // 可以继续在这里添加更多博客文章
 ]

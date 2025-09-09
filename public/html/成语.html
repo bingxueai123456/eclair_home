@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成语学习宝库 (Idiom Learning Treasury)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application is designed as an interactive dashboard for exploring Chinese idioms. The structure prioritizes user-driven discovery over a static, linear narrative. The core components are: 1) A prominent search bar for direct lookup. 2) Category filters to allow thematic exploration (e.g., emotions, actions, situations). 3) An interactive grid of idiom "cards" for easy browsing. 4) A modal pop-up for detailed information (pinyin, definition) on-demand. 5) A summary chart visualizing the distribution of idioms by category. This structure was chosen because a raw list of 400+ idioms is overwhelming. By providing tools for searching, filtering, and progressive disclosure of information, the app empowers users to learn at their own pace and focus on idioms relevant to their interests, making the learning process more manageable and engaging than a simple text document. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: A flat list of 400+ Chinese idioms.
+        - Goal: Facilitate learning and memorization.
+        - Viz/Presentation Method: 
+            1. Idiom Grid: A responsive grid of HTML `div` elements styled with Tailwind CSS. Each `div` acts as a "card" displaying one idiom. Goal is organization and scannability.
+            2. Detail Modal: An HTML `div`, initially hidden, that displays detailed information. Goal is to provide context without cluttering the main view.
+            3. Category Chart: A doughnut chart using Chart.js (`<canvas>`). Goal is to provide a high-level overview of the data composition.
+        - Interaction:
+            1. Search Input: Filters the grid in real-time using JavaScript event listeners.
+            2. Filter Buttons: On click, they filter the grid by category.
+            3. Card Click: Triggers a JavaScript function to populate and display the detail modal.
+        - Justification: This multi-faceted approach transforms a static list into a dynamic learning tool. The grid provides discoverability, search/filters provide targeted learning, the modal offers deep-dives, and the chart gives a meta-perspective. This is more effective for retention than a passive reading experience.
+        - Library/Method: Vanilla JS for logic, Tailwind for styling, Chart.js for visualization.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .modal-backdrop {
+            background-color: rgba(0,0,0,0.5);
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content {
+            transition: transform 0.3s ease-in-out;
+        }
+        .btn-category.active {
+            background-color: #8D6E63;
+            color: #FFFFFF;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="app" class="container mx-auto p-4 sm:p-6 md:p-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-stone-800 mb-2">成语学习宝库</h1>
+            <p class="text-stone-600">一个探索、学习和发现成语的互动空间。</p>
+        </header>
+
+        <div class="sticky top-0 z-10 bg-[#FDFBF8]/80 backdrop-blur-sm py-4 mb-6">
+            <div class="max-w-3xl mx-auto">
+                <input type="text" id="search-input" placeholder="🔍 搜索成语..." class="w-full px-5 py-3 text-lg border-2 border-stone-300 rounded-full focus:ring-2 focus:ring-amber-800 focus:border-amber-800 transition-shadow shadow-sm">
+            </div>
+        </div>
+
+        <div class="mb-8">
+             <div class="flex flex-col lg:flex-row gap-8 items-start">
+                <div class="w-full lg:w-1/3">
+                    <h2 class="text-2xl font-bold text-stone-700 mb-4 text-center lg:text-left">成语分类</h2>
+                    <div id="category-filters" class="flex flex-wrap justify-center lg:flex-col gap-3">
+                    </div>
+                </div>
+                <div class="w-full lg:w-2/3 flex items-center justify-center">
+                    <div class="chart-container relative h-64 md:h-80 w-full max-w-md mx-auto">
+                        <canvas id="idioms-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <main>
+            <div class="flex justify-between items-center mb-4">
+                 <h2 class="text-2xl font-bold text-stone-700">全部成语</h2>
+                 <p id="idiom-count" class="text-stone-500 font-medium"></p>
+            </div>
+            <div id="idiom-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            </div>
+             <p id="no-results" class="hidden text-center text-stone-500 py-12">未找到匹配的成语。</p>
+        </main>
+
+    </div>
+
+    <div id="idiom-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 modal-backdrop opacity-0 pointer-events-none">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-md p-6 sm:p-8 modal-content transform scale-95">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 id="modal-idiom" class="text-3xl font-bold text-amber-900"></h2>
+                    <p id="modal-pinyin" class="text-lg text-stone-500"></p>
+                </div>
+                <button id="close-modal" class="text-3xl text-stone-400 hover:text-stone-700 transition">&times;</button>
+            </div>
+            <div>
+                 <p id="modal-category" class="inline-block bg-amber-100 text-amber-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded-full mb-4"></p>
+                 <p id="modal-definition" class="text-stone-700 text-base leading-relaxed"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const idioms = [
+            { text: "步履蹒跚", pinyin: "bù lǚ pán shān", definition: "形容走路摇摆、缓慢的姿态。", category: "状态与情境" },
+            { text: "风雨飘摇", pinyin: "fēng yǔ piāo yáo", definition: "形容形势、地位及个人生活动荡不安。", category: "状态与情境" },
+            { text: "如日中天", pinyin: "rú rì zhōng tiān", definition: "比喻事物正发展到十分兴盛的阶段。", category: "状态与情境" },
+            { text: "似是而非", pinyin: "sì shì ér fēi", definition: "表面看来似乎对，实际上不对。", category: "哲理与智慧" },
+            { text: "风云突变", pinyin: "fēng yún tū biàn", definition: "比喻局势突然发生巨大变化。", category: "状态与情境" },
+            { text: "形形色色", pinyin: "xíng xíng sè sè", definition: "形容种类繁多，各式各样。", category: "状态与情境" },
+            { text: "疲惫不堪", pinyin: "pí bèi bù kān", definition: "形容非常疲乏，一点力气也没有。", category: "心理与情感" },
+            { text: "心力交瘁", pinyin: "xīn lì jiāo cuì", definition: "精神和体力都极度劳累。", category: "心理与情感" },
+            { text: "拥挤不堪", pinyin: "yōng jǐ bù kān", definition: "形容人或物过多，十分拥挤。", category: "状态与情境" },
+            { text: "心慌意乱", pinyin: "xīn huāng yì luàn", definition: "心里着慌，乱了主意。", category: "心理与情感" },
+            { text: "变化无常", pinyin: "biàn huà wú cháng", definition: "变化很多，没有常态。", category: "状态与情境" },
+            { text: "朝令夕改", pinyin: "zhāo lìng xī gǎi", definition: "早上发布的命令，晚上就改变了。形容政令多变，没有定准。", category: "行为与行动" },
+            { text: "纷繁复杂", pinyin: "fēn fán fù zá", definition: "头绪多，情况复杂。", category: "状态与情境" },
+            { text: "流连忘返", pinyin: "liú lián wàng fǎn", definition: "留恋不舍，忘记返回。", category: "心理与情感" },
+            { text: "轻松自如", pinyin: "qīng sōng zì rú", definition: "非常轻松，毫不费力。", category: "心理与情感" },
+            { text: "威风凛凛", pinyin: "wēi fēng lǐn lǐn", definition: "形容声势或气派严峻，令人敬畏。", category: "人物与品质" },
+            { text: "不言而喻", pinyin: "bù yán ér yù", definition: "不用说就可以明白。", category: "哲理与智慧" },
+            { text: "习以为常", pinyin: "xí yǐ wéi cháng", definition: "习惯了，就当做平常的事。", category: "心理与情感" },
+            { text: "惊魂未定", pinyin: "jīng hún wèi dìng", definition: "受惊吓后，心情尚未平静。", category: "心理与情感" },
+            { text: "面面相觑", pinyin: "miàn miàn xiāng qù", definition: "你看着我，我看着你，不知所措。", category: "行为与行动" },
+            { text: "方寸大乱", pinyin: "fāng cùn dà luàn", definition: "心绪，思想大乱。", category: "心理与情感" },
+            { text: "停滞不前", pinyin: "tíng zhì bù qián", definition: "停止下来，不继续前进。", category: "状态与情境" },
+            { text: "高度警觉", pinyin: "gāo dù jǐng jué", definition: "非常警惕，时刻防备。", category: "心理与情感" },
+            { text: "神经紧绷", pinyin: "shén jīng jǐn bēng", definition: "形容精神高度紧张。", category: "心理与情感" },
+            { text: "精神不济", pinyin: "jīng shén bù jì", definition: "精神状态不好。", category: "心理与情感" },
+            { text: "苦不堪言", pinyin: "kǔ bù kān yán", definition: "痛苦得说不出来。", category: "心理与情感" },
+            { text: "山穷水尽", pinyin: "shān qióng shuǐ jìn", definition: "比喻陷入绝境。", category: "状态与情境" },
+            { text: "虚无坐席", pinyin: "xū wú zuò xí", definition: "比喻职位空着等人来坐。应为“虚位以待”。", category: "状态与情境" },
+            { text: "如影随形", pinyin: "rú yǐng suí xíng", definition: "比喻关系密切，经常在一起。", category: "状态与情境" },
+            { text: "风吹草动", pinyin: "fēng chuī cǎo dòng", definition: "比喻微小的变动或迹象。", category: "状态与情境" },
+            { text: "一贫如洗", pinyin: "yī pín rú xǐ", definition: "穷得像用水洗过似的，什么都没有。", category: "状态与情境" },
+            { text: "裹足不前", pinyin: "guǒ zú bù qián", definition: "停步不前，好像脚被缠住了一样。", category: "行为与行动" },
+            { text: "身心疲惫", pinyin: "shēn xīn pí bèi", definition: "身体和精神都感到非常疲劳。", category: "心理与情感" },
+            { text: "息息相关", pinyin: "xī xī xiāng guān", definition: "呼吸相关联，形容关系非常密切。", category: "状态与情境" },
+            { text: "屡见不鲜", pinyin: "lǚ jiàn bù xiān", definition: "常常见到，并不新奇。", category: "状态与情境" },
+            { text: "狼狈不堪", pinyin: "láng bèi bù kān", definition: "形容处境非常困难、窘迫。", category: "状态与情境" },
+            { text: "风云变化", pinyin: "fēng yún biàn huà", definition: "比喻时局变化迅速，动荡不定。", category: "状态与情境" },
+            { text: "黯然失色", pinyin: "àn rán shī sè", definition: "指事物相比之下显得逊色。", category: "结果与影响" },
+            { text: "黯然解体", pinyin: "àn rán jiě tǐ", definition: "指一个组织或结构悄然无声地瓦解。", category: "结果与影响" },
+            { text: "寥寥无几", pinyin: "liáo liáo wú jǐ", definition: "非常少，没有几个。", category: "状态与情境" },
+            { text: "祸不单行", pinyin: "huò bù dān xíng", definition: "不幸的事接连发生。", category: "状态与情境" },
+            { text: "入不敷出", pinyin: "rù bù fū chū", definition: "收入不够开支。", category: "状态与情境" },
+            { text: "身心俱疲", pinyin: "shēn xīn jù pí", definition: "身体和精神都非常疲劳。", category: "心理与情感" },
+            { text: "精疲力竭", pinyin: "jīng pí lì jié", definition: "精神、力气都用完了。形容非常疲劳。", category: "心理与情感" },
+            { text: "晦涩难懂", pinyin: "huì sè nán dǒng", definition: "文字等隐晦、不易理解。", category: "状态与情境" },
+            { text: "面面俱到", pinyin: "miàn miàn jù dào", definition: "各方面都能照顾到，没有遗漏。", category: "行为与行动" },
+            { text: "浩如烟海", pinyin: "hào rú yān hǎi", definition: "形容文献、资料等非常丰富。", category: "状态与情境" },
+            { text: "后继无力", pinyin: "hòu jì wú lì", definition: "后续的力量跟不上。", category: "状态与情境" },
+            { text: "悄无声息", pinyin: "qiāo wú shēng xī", definition: "非常寂静，没有一点声音。", category: "状态与情境" },
+            { text: "从容不迫", pinyin: "cóng róng bù pò", definition: "态度镇静，不慌不忙。", category: "心理与情感" },
+            { text: "气势汹汹", pinyin: "qì shì xiōng xiōng", definition: "形容气势很盛，来势凶猛。", category: "状态与情境" },
+            { text: "分崩瓦解", pinyin: "fēn bēng wǎ jiě", definition: "比喻集团、组织等分裂、瓦解。", category: "结果与影响" },
+            { text: "昙花一现", pinyin: "tán huā yī xiàn", definition: "比喻美好的事物或景象出现了一下，很快就消失。", category: "状态与情境" },
+            { text: "无处可逃", pinyin: "wú chù kě táo", definition: "没有地方可以逃跑。", category: "状态与情境" },
+            { text: "暗流涌动", pinyin: "àn liú yǒng dòng", definition: "比喻暗中进行、酝酿着的活动或斗争。", category: "状态与情境" },
+            { text: "人远天涯近", pinyin: "rén yuǎn tiān yá jìn", definition: "想念远方的人，感觉距离很近。", category: "心理与情感" },
+            { text: "兵强马壮", pinyin: "bīng qiáng mǎ zhuàng", definition: "兵力强盛，战马健壮。", category: "状态与情境" },
+            { text: "人才济济", pinyin: "rén cái jǐ jǐ", definition: "形容有才能的人很多。", category: "状态与情境" },
+            { text: "旷日持久", pinyin: "kuàng rì chí jiǔ", definition: "拖延的时间很长。", category: "状态与情境" },
+            { text: "瞬息万变", pinyin: "shùn xī wàn biàn", definition: "在极短的时间内发生了千变万化。", category: "状态与情境" },
+            { text: "迫不得已", pinyin: "pò bù dé yǐ", definition: "出于无奈，不得不这样。", category: "状态与情境" },
+            { text: "老生常谈", pinyin: "lǎo shēng cháng tán", definition: "比喻听厌了的没有新意的话。", category: "哲理与智慧" },
+            { text: "势不可挡", pinyin: "shì bù kě dǎng", definition: "来势迅猛，无法抵挡。", category: "状态与情境" },
+            { text: "相安无事", pinyin: "xiāng ān wú shì", definition: "彼此和睦相处，没有发生冲突。", category: "状态与情境" },
+            { text: "根深蒂固", pinyin: "gēn shēn dì gù", definition: "比喻基础深厚，不容易动摇。", category: "状态与情境" },
+            { text: "跌宕起伏", pinyin: "diē dàng qǐ fú", definition: "形容事物多变，不稳定。", category: "状态与情境" },
+            { text: "波澜壮阔", pinyin: "bō lán zhuàng kuò", definition: "比喻声势雄壮浩大。", category: "状态与情境" },
+            { text: "人性涣散", pinyin: "rén xìng huàn sàn", definition: "指人心不齐，思想不统一。", category: "状态与情境" },
+            { text: "阴晴圆缺", pinyin: "yīn qíng yuán quē", definition: "比喻人生的悲欢离合。", category: "哲理与智慧" },
+            { text: "争奇斗艳", pinyin: "zhēng qí dòu yàn", definition: "竞相展示形貌、色彩的奇异、艳丽。", category: "行为与行动" },
+            { text: "语焉不详", pinyin: "yǔ yān bù xiáng", definition: "指虽然提到了，但说得不详细。", category: "行为与行动" },
+            { text: "妙手偶得", pinyin: "miào shǒu ǒu dé", definition: "指文学、艺术方面灵感来了，偶然间得到的好作品。", category: "结果与影响" },
+            { text: "越俎代庖", pinyin: "yuè zǔ dài páo", definition: "比喻超出自己业务范围去处理别人所管的事。", category: "行为与行动" },
+            { text: "反求诸己", pinyin: "fǎn qiú zhū jǐ", definition: "从自己身上找原因。", category: "哲理与智慧" },
+            { text: "循序渐进", pinyin: "xún xù jiàn jìn", definition: "按照一定的步骤逐渐深入或提高。", category: "行为与行动" },
+            { text: "化茧成蝶", pinyin: "huà jiǎn chéng dié", definition: "比喻经过艰苦的磨练，终于获得成功。", category: "结果与影响" },
+            { text: "应时应景", pinyin: "yìng shí yìng jǐng", definition: "适合当时的情景。", category: "行为与行动" },
+            { text: "开诚布公", pinyin: "kāi chéng bù gōng", definition: "指以诚心待人，坦白无私。", category: "行为与行动" },
+            { text: "晓之以理", pinyin: "xiǎo zhī yǐ lǐ", definition: "用道理来开导他。", category: "行为与行动" },
+            { text: "避重就轻", pinyin: "bì zhòng jiù qīng", definition: "回避重要的，只抓次要的。", category: "行为与行动" },
+            { text: "随性所欲", pinyin: "suí xìng suǒ yù", definition: "随着自己的意思，想要干什么就干什么。", category: "行为与行动" },
+            { text: "漫无目的", pinyin: "màn wú mù dì", definition: "没有目的，随意行动。", category: "行为与行动" },
+            { text: "互通有无", pinyin: "hù tōng yǒu wú", definition: "拿出自己多余的，交换自己缺少的。", category: "行为与行动" },
+            { text: "无所不用其极", pinyin: "wú suǒ bù yòng qí jí", definition: "做坏事时什么手段都使出来。", category: "行为与行动" },
+            { text: "搬弄是非", pinyin: "bān nòng shì fēi", definition: "把别人的话传来传去，从中挑拨。", category: "行为与行动" },
+            { text: "趋之若鹜", pinyin: "qū zhī ruò wù", definition: "比喻很多人争着去追求（不好的事物）。", category: "行为与行动" },
+            { text: "纷纷效仿", pinyin: "fēn fēn xiào fǎng", definition: "许多人接二连三地模仿。", category: "行为与行动" },
+            { text: "由内而外", pinyin: "yóu nèi ér wài", definition: "从内部到外部。", category: "哲理与智慧" },
+            { text: "力所能及", pinyin: "lì suǒ néng jí", definition: "在自己力量的限度内所能做到的。", category: "行为与行动" },
+            { text: "有条不紊", pinyin: "yǒu tiáo bù wěn", definition: "形容做事、说话有条理，不混乱。", category: "状态与情境" },
+            { text: "张弛有度", pinyin: "zhāng chí yǒu dù", definition: "比喻松紧有节，劳逸结合。", category: "哲理与智慧" },
+            { text: "扬长避短", pinyin: "yáng cháng bì duǎn", definition: "发扬优点，避开缺点。", category: "哲理与智慧" },
+            { text: "追求卓越", pinyin: "zhuī qiú zhuó yuè", definition: "努力达到非凡的、杰出的境地。", category: "行为与行动" },
+            { text: "置之不理", pinyin: "zhì zhī bù lǐ", definition: "放在一边，不理不睬。", category: "行为与行动" },
+            { text: "排除万难", pinyin: "pái chú wàn nán", definition: "扫除重重障碍和困难。", category: "行为与行动" },
+            { text: "照本宣科", pinyin: "zhào běn xuān kē", definition: "形容死板地照着本子念，毫无发挥。", category: "行为与行动" },
+            { text: "痛定思痛", pinyin: "tòng dìng sī tòng", definition: "在痛苦深切之后，再回想当时的痛苦。", category: "心理与情感" },
+            { text: "肆意妄为", pinyin: "sì yì wàng wéi", definition: "毫无顾忌地胡作非为。", category: "行为与行动" },
+            { text: "松弛有度", pinyin: "sōng chí yǒu dù", definition: "指松紧有节制。同“张弛有度”。", category: "哲理与智慧" },
+            { text: "唇枪舌剑", pinyin: "chún qiāng shé jiàn", definition: "形容辩论激烈，言辞锋利。", category: "行为与行动" },
+            { text: "深思熟虑", pinyin: "shēn sī shú lǜ", definition: "深入、周密地思考。", category: "行为与行动" },
+            { text: "持之以恒", pinyin: "chí zhī yǐ héng", definition: "长久地坚持下去。", category: "行为与行动" },
+            { text: "广结善缘", pinyin: "guǎng jié shàn yuán", definition: "广泛地结交好的缘分。", category: "行为与行动" },
+            { text: "举手之劳", pinyin: "jǔ shǒu zhī láo", definition: "一举手那样的辛劳。比喻事情轻而易举，不费力。", category: "行为与行动" },
+            { text: "摸爬滚打", pinyin: "mō pá gǔn dǎ", definition: "比喻在艰苦的环境中锻炼。", category: "行为与行动" },
+            { text: "仓皇而逃", pinyin: "cāng huáng ér táo", definition: "匆忙、慌张地逃跑。", category: "行为与行动" },
+            { text: "贸然心动", pinyin: "mào rán xīn dòng", definition: "轻率地动了心念。", category: "心理与情感" },
+            { text: "偷工减料", pinyin: "tōu gōng jiǎn liào", definition: "原指商人为了牟取暴利而暗中降低产品质量。", category: "行为与行动" },
+            { text: "违法乱纪", pinyin: "wéi fǎ luàn jì", definition: "违犯法律，破坏纪律。", category: "行为与行动" },
+            { text: "恪尽职守", pinyin: "kè jìn zhí shǒu", definition: "谨慎、恭敬地尽自己的职责。", category: "人物与品质" },
+            { text: "尽心尽力", pinyin: "jìn xīn jìn lì", definition: "用尽心思，使出全力。", category: "行为与行动" },
+            { text: "各司其职", pinyin: "gè sī qí zhí", definition: "每个人都负责自己的工作。", category: "行为与行动" },
+            { text: "秋毫不犯", pinyin: "qiū háo bù fàn", definition: "指军队纪律严明，不侵犯人民的利益。", category: "人物与品质" },
+            { text: "出生入死", pinyin: "chū shēng rù sǐ", definition: "形容冒着生命危险，不顾个人安危。", category: "行为与行动" },
+            { text: "开疆拓土", pinyin: "kāi jiāng tuò tǔ", definition: "开拓疆域，扩展领土。", category: "行为与行动" },
+            { text: "逐鹿中原", pinyin: "zhú lù zhōng yuán", definition: "比喻群雄并起，争夺天下。", category: "行为与行动" },
+            { text: "不远万里", pinyin: "bù yuǎn wàn lǐ", definition: "不以万里为远。形容不畏路途遥远。", category: "行为与行动" },
+            { text: "狂悖之行", pinyin: "kuáng bèi zhī xíng", definition: "狂妄、违背常理的行为。", category: "行为与行动" },
+            { text: "接踵而来", pinyin: "jiē zhǒng ér lái", definition: "形容人、事物一个接着一个到来。", category: "状态与情境" },
+            { text: "铤而走险", pinyin: "tǐng ér zǒu xiǎn", definition: "因无路可走而采取冒险行动。", category: "行为与行动" },
+            { text: "尽心竭力", pinyin: "jìn xīn jié lì", definition: "用尽心思，使出全力。", category: "行为与行动" },
+            { text: "偷梁换柱", pinyin: "tōu liáng huàn zhù", definition: "比喻暗中玩弄手法，以假代真，以劣代优。", category: "行为与行动" },
+            { text: "以逸待劳", pinyin: "yǐ yì dài láo", definition: "指在战争中做好充分准备，等待疲惫的敌人。", category: "哲理与智慧" },
+            { text: "精打细算", pinyin: "jīng dǎ xì suàn", definition: "在使用人力、物力时，仔细计算。", category: "行为与行动" },
+            { text: "蛊惑人心", pinyin: "gǔ huò rén xīn", definition: "迷惑、毒害人的思想。", category: "行为与行动" },
+            { text: "结党营私", pinyin: "jié dǎng yíng sī", definition: "为谋求私利而拉帮结派。", category: "行为与行动" },
+            { text: "兴师动众", pinyin: "xīng shī dòng zhòng", definition: "发动很多人去做某件事（多含贬义）。", category: "行为与行动" },
+            { text: "劳民伤财", pinyin: "láo mín shāng cái", definition: "既使人民劳苦，又耗费钱财。", category: "结果与影响" },
+            { text: "为所欲为", pinyin: "wéi suǒ yù wéi", definition: "想干什么就干什么。", category: "行为与行动" },
+            { text: "筑牢根基", pinyin: "zhù láo gēn jī", definition: "把基础建设得非常牢固。", category: "行为与行动" },
+            { text: "遇水搭桥，逢山开道", pinyin: "yù shuǐ dā qiáo, féng shān kāi dào", definition: "比喻不畏艰险，勇往直前。", category: "行为与行动" },
+            { text: "根正苗红", pinyin: "gēn zhèng miáo hóng", definition: "比喻出身好，政治上可靠。", category: "人物与品质" },
+            { text: "妙至毫巅", pinyin: "miào zhì háo diān", definition: "形容技艺、境界等高妙到了极点。", category: "结果与影响" },
+            { text: "不屈不挠", pinyin: "bù qū bù náo", definition: "在困难面前，不低头，不屈服。", category: "人物与品质" },
+            { text: "蛮狠无理", pinyin: "mán hèng wú lǐ", definition: "粗暴、凶狠、不讲道理。", category: "人物与品质" },
+            { text: "攻守兼备", pinyin: "gōng shǒu jiān bèi", definition: "进攻和防守都准备得很好。", category: "状态与情境" },
+            { text: "光彩照人", pinyin: "guāng cǎi zhào rén", definition: "形容人或事物光芒四射，非常引人注目。", category: "人物与品质" },
+            { text: "品行端正", pinyin: "pǐn xíng duān zhèng", definition: "品德和行为都很端正。", category: "人物与品质" },
+            { text: "慧眼如炬", pinyin: "huì yǎn rú jù", definition: "形容眼光敏锐，能洞察一切。", category: "人物与品质" },
+            { text: "心胸宽广", pinyin: "xīn xiōng kuān guǎng", definition: "心里容得下很多事，不斤斤计较。", category: "人物与品质" },
+            { text: "宠辱不惊", pinyin: "chǒng rǔ bù jīng", definition: "受宠或受辱都不动心。指心理素质好。", category: "人物与品质" },
+            { text: "游刃有余", pinyin: "yóu rèn yǒu yú", definition: "比喻工作熟练，有实际经验，解决问题毫不费事。", category: "状态与情境" },
+            { text: "固步自封", pinyin: "gù bù zì fēng", definition: "比喻守着老一套，不求进步。", category: "行为与行动" },
+            { text: "独具慧眼", pinyin: "dú jù huì yǎn", definition: "能看到别人看不到的东西，形容眼光敏锐，见解高超。", category: "人物与品质" },
+            { text: "仁者之师", pinyin: "rén zhě zhī shī", definition: "施行仁义的军队。", category: "人物与品质" },
+            { text: "人微言轻", pinyin: "rén wēi yán qīng", definition: "地位低，说话不受人重视。", category: "人物与品质" },
+            { text: "眼高手低", pinyin: "yǎn gāo shǒu dī", definition: "指要求的标准很高，但自己实际的能力很低。", category: "人物与品质" },
+            { text: "能说会道", pinyin: "néng shuō huì dào", definition: "形容很会讲话。", category: "人物与品质" },
+            { text: "真知灼见", pinyin: "zhēn zhī zhuó jiàn", definition: "正确而深刻的认识和见解。", category: "哲理与智慧" },
+            { text: "知人善用", pinyin: "zhī rén shàn yòng", definition: "了解人的品德和才能，并能恰当地使用。", category: "人物与品质" },
+            { text: "独当一面", pinyin: "dú dāng yī miàn", definition: "单独负责一个方面的工作。", category: "人物与品质" },
+            { text: "礼贤下士", pinyin: "lǐ xián xià shì", definition: "对有才有德的人以礼相待，对普通人也能谦虚交往。", category: "人物与品质" },
+            { text: "巧言令色", pinyin: "qiǎo yán lìng sè", definition: "用动听的言语和伪善的面目来讨好别人。", category: "人物与品质" },
+            { text: "心怀不轨", pinyin: "xīn huái bù guǐ", definition: "心里有不可告人的目的。", category: "人物与品质" },
+            { text: "贪得无厌", pinyin: "tān dé wú yàn", definition: "贪心，永远没有满足的时候。", category: "人物与品质" },
+            { text: "不可小觑", pinyin: "bù kě xiǎo qù", definition: "不能小看。", category: "哲理与智慧" },
+            { text: "无师自通", pinyin: "wú shī zì tōng", definition: "没有老师的传授，自己就学会了。", category: "人物与品质" },
+            { text: "心领神会", pinyin: "xīn lǐng shén huì", definition: "指对方没有明说，心里已经领会。", category: "心理与情感" },
+            { text: "奇思妙想", pinyin: "qí sī miào xiǎng", definition: "奇妙、独特的想法。", category: "哲理与智慧" },
+            { text: "豁然开朗", pinyin: "huò rán kāi lǎng", definition: "形容由狭窄幽暗一变为宽阔明亮。", category: "心理与情感" },
+            { text: "趋乐避苦", pinyin: "qū lè bì kǔ", definition: "追求快乐，躲避痛苦。", category: "心理与情感" },
+            { text: "立足长远", pinyin: "lì zú cháng yuǎn", definition: "从长远的利益出发。", category: "哲理与智慧" },
+            { text: "幡然醒悟", pinyin: "pān rán xǐng wù", definition: "很快地认识到自己的错误而觉悟过来。", category: "心理与情感" },
+            { text: "怨天尤人", pinyin: "yuàn tiān yóu rén", definition: "指遇到挫折或出了问题，一味埋怨天，责怪人。", category: "心理与情感" },
+            { text: "备受煎熬", pinyin: "bèi shòu jiān áo", definition: "受到极大的折磨和痛苦。", category: "心理与情感" },
+            { text: "敬畏之心", pinyin: "jìng wèi zhī xīn", definition: "既尊敬又害怕的心情。", category: "心理与情感" },
+            { text: "志得意满", pinyin: "zhì dé yì mǎn", definition: "形容愿望实现，非常得意。", category: "心理与情感" },
+            { text: "油然而生", pinyin: "yóu rán ér shēng", definition: "形容思想感情自然而然地产生。", category: "心理与情感" },
+            { text: "沾沾自喜", pinyin: "zhān zhān zì xǐ", definition: "形容自以为不错而得意的样子。", category: "心理与情感" },
+            { text: "自暴自弃", pinyin: "zì bào zì qì", definition: "自己糟蹋自己，自己放弃自己。", category: "心理与情感" },
+            { text: "恍然大悟", pinyin: "huǎng rán dà wù", definition: "形容一下子明白过来。", category: "心理与情感" },
+            { text: "先入为主", pinyin: "xiān rù wéi zhǔ", definition: "指先听进去的话或先获得的印象往往在头脑中占有主导地位，以后再遇到不同的意见时，就不容易接受。", category: "哲理与智慧" },
+            { text: "一知半解", pinyin: "yī zhī bàn jiě", definition: "知道得不全面，理解得不透彻。", category: "哲理与智慧" },
+            { text: "独善其身", pinyin: "dú shàn qí shēn", definition: "只顾自己，不管别人。", category: "行为与行动" },
+            { text: "睥睨天下", pinyin: "pì nì tiān xià", definition: "形容非常骄傲，看不起天下所有的人。", category: "心理与情感" },
+            { text: "心中有数", pinyin: "xīn zhōng yǒu shù", definition: "指对情况和问题有基本的了解，处理起来有把握。", category: "心理与情感" },
+            { text: "趾高气扬", pinyin: "zhǐ gāo qì yáng", definition: "形容骄傲自满，得意忘形的样子。", category: "心理与情感" },
+            { text: "大喜过望", pinyin: "dà xǐ guò wàng", definition: "结果比原来希望的还好，因而感到特别高兴。", category: "心理与情感" },
+            { text: "心悦诚服", pinyin: "xīn yuè chéng fú", definition: "由衷地高兴，真心地服气。", category: "心理与情感" },
+            { text: "清心寡欲", pinyin: "qīng xīn guǎ yù", definition: "保持心地宁静，减少欲望。", category: "心理与情感" },
+            { text: "喜笑颜开", pinyin: "xǐ xiào yán kāi", definition: "形容心里高兴，满面笑容。", category: "心理与情感" },
+            { text: "感激涕零", pinyin: "gǎn jī tì líng", definition: "感激得掉下眼泪。形容非常感激。", category: "心理与情感" },
+            { text: "深以为然", pinyin: "shēn yǐ wéi rán", definition: "表示对别人的观点或做法非常赞同。", category: "心理与情感" },
+            { text: "急于求成", pinyin: "jí yú qiú chéng", definition: "急着要取得成功。", category: "心理与情感" },
+            { text: "忐忑不安", pinyin: "tǎn tè bù ān", definition: "心神不定，七上八下的。", category: "心理与情感" },
+            { text: "高枕无忧", pinyin: "gāo zhěn wú yōu", definition: "垫高枕头睡觉，无忧无虑。比喻平安无事，不用担心。", category: "心理与情感" },
+            { text: "居心叵测", pinyin: "jū xīn pǒ cè", definition: "指存心险恶，难以预测。", category: "心理与情感" },
+            { text: "戒骄戒躁", pinyin: "jiè jiāo jiè zào", definition: "要避免骄傲和急躁。", category: "哲理与智慧" },
+            { text: "扬名立万", pinyin: "yáng míng lì wàn", definition: "扬名于世，树立声望。", category: "结果与影响" },
+            { text: "细枝末节", pinyin: "xì zhī mò jié", definition: "比喻事情或问题的细小部分。", category: "状态与情境" },
+            { text: "举足轻重", pinyin: "jǔ zú qīng zhòng", definition: "指处于重要地位，一举一动都关系到全局。", category: "状态与情境" },
+            { text: "微不足道", pinyin: "wēi bù zú dào", definition: "非常藐小，不值得一提。", category: "状态与情境" },
+            { text: "不胜枚举", pinyin: "bù shèng méi jǔ", definition: "无法一个一个地全列举出来。形容数量很多。", category: "状态与情境" },
+            { text: "不足挂齿", pinyin: "bù zú guà chǐ", definition: "不值得一提。", category: "状态与情境" },
+            { text: "无以复加", pinyin: "wú yǐ fù jiā", definition: "不可能再增加了。指程度达到了极点。", category: "状态与情境" },
+            { text: "至高无上", pinyin: "zhì gāo wú shàng", definition: "高到顶点，再也没有更高的了。", category: "状态与情境" },
+            { text: "史无前例", pinyin: "shǐ wú qián lì", definition: "历史上从来没有过的事。", category: "状态与情境" },
+            { text: "后无来者", pinyin: "hòu wú lái zhě", definition: "指以后再也不会有这样的人了。", category: "状态与情境" },
+            { text: "不可言喻", pinyin: "bù kě yán yù", definition: "无法用语言来说明。", category: "状态与情境" },
+            { text: "无以言表", pinyin: "wú yǐ yán biǎo", definition: "无法用语言来表达。", category: "心理与情感" },
+            { text: "与日俱增", pinyin: "yǔ rì jù zēng", definition: "随着时间的推移而不断增长。", category: "状态与情境" },
+            { text: "难能可贵", pinyin: "nán néng kě guì", definition: "指不容易做到的事居然做到了，因而非常可贵。", category: "结果与影响" },
+            { text: "跃然纸上", pinyin: "yuè rán zhǐ shàng", definition: "形容文学作品叙述描写真实、生动。", category: "结果与影响" },
+            { text: "始料未及", pinyin: "shǐ liào wèi jí", definition: "最初没有料到。", category: "结果与影响" },
+            { text: "顺理成章", pinyin: "shùn lǐ chéng zhāng", definition: "写文章或做事情顺着条理就能做好。", category: "结果与影响" },
+            { text: "情有可原", pinyin: "qíng yǒu kě yuán", definition: "在情理上可以原谅。", category: "哲理与智慧" },
+            { text: "血本无归", pinyin: "xuè běn wú guī", definition: "本钱全部亏损，一点也没收回。", category: "结果与影响" },
+            { text: "毫无建树", pinyin: "háo wú jiàn shù", definition: "一点成就也没有。", category: "结果与影响" },
+            { text: "应运而生", pinyin: "yìng yùn ér shēng", definition: "适应时机而产生。", category: "结果与影响" },
+            { text: "顾此失彼", pinyin: "gù cǐ shī bǐ", definition: "顾了这个，丢了那个。形容不能全面照顾。", category: "结果与影响" },
+            { text: "立竿见影", pinyin: "lì gān jiàn yǐng", definition: "比喻立刻见到功效。", category: "结果与影响" },
+            { text: "轩然大波", pinyin: "xuān rán dà bō", definition: "比喻大的纠纷或风潮。", category: "结果与影响" },
+            { text: "催人奋进", pinyin: "cuī rén fèn jìn", definition: "鼓励人努力上进。", category: "结果与影响" },
+            { text: "高下立判", pinyin: "gāo xià lì pàn", definition: "优劣、胜负立刻就能分辨出来。", category: "结果与影响" },
+            { text: "百试百灵", pinyin: "bǎi shì bǎi líng", definition: "每次试验都很灵验。", category: "结果与影响" },
+            { text: "九死一生", pinyin: "jiǔ sǐ yī shēng", definition: "形容生命垂危，幸免于死。", category: "结果与影响" },
+            { text: "迎刃而解", pinyin: "yíng rèn ér jiě", definition: "比喻主要问题解决了，其他问题就很容易解决。", category: "结果与影响" },
+            { text: "全身而退", pinyin: "quán shēn ér tuì", definition: "比喻完好地退下来，没有受到任何损失。", category: "结果与影响" },
+            { text: "祸及己身", pinyin: "huò jí jǐ shēn", definition: "灾祸牵连到自己身上。", category: "结果与影响" },
+            { text: "行之有效", pinyin: "xíng zhī yǒu xiào", definition: "实行起来有成效。", category: "结果与影响" },
+            { text: "盆满钵满", pinyin: "pén mǎn bō mǎn", definition: "形容赚了很多钱。", category: "结果与影响" },
+            { text: "无济于事", pinyin: "wú jì yú shì", definition: "对事情没有什么帮助或益处。", category: "结果与影响" },
+            { text: "脱颖而出", pinyin: "tuō yǐng ér chū", definition: "比喻人的才能全部显示出来。", category: "结果与影响" },
+            { text: "一蹶不振", pinyin: "yī jué bù zhèn", definition: "比喻受到一次挫折，就再也振作不起来。", category: "结果与影响" },
+            { text: "独占鳌头", pinyin: "dú zhàn áo tóu", definition: "比喻占首位或第一名。", category: "结果与影响" },
+            { text: "一骑绝尘", pinyin: "yī qí jué chén", definition: "形容跑得很快，远远地走在最前面。", category: "结果与影响" },
+            { text: "分崩离析", pinyin: "fēn bēng lí xī", definition: "形容国家、集团等分裂瓦解。", category: "结果与影响" },
+            { text: "本末倒置", pinyin: "běn mò dào zhì", definition: "比喻把主次、轻重的位置弄颠倒了。", category: "哲理与智慧" },
+            { text: "细水长流", pinyin: "xì shuǐ cháng liú", definition: "比喻节约使用财物，使之长久不缺。", category: "哲理与智慧" },
+            { text: "画地为牢", pinyin: "huà dì wéi láo", definition: "比喻只许在指定的范围内活动。", category: "行为与行动" },
+            { text: "背道而驰", pinyin: "bèi dào ér chí", definition: "比喻方向和目的完全相反。", category: "行为与行动" },
+            { text: "三思而后行", pinyin: "sān sī ér hòu xíng", definition: "经过反复考虑，然后再去做。", category: "哲理与智慧" },
+            { text: "士为知己者死，女为悦己者容", pinyin: "shì wèi zhī jǐ zhě sǐ, nǚ wèi yuè jǐ zhě róng", definition: "男人愿为赏识自己的人献身，女人愿为喜爱自己的人修饰容貌。", category: "哲理与智慧" },
+            { text: "天花乱坠", pinyin: "tiān huā luàn zhuì", definition: "形容说话非常动听，但多指过分夸张而不切实际。", category: "行为与行动" },
+            { text: "前车之鉴", pinyin: "qián chē zhī jiàn", definition: "比喻把前人或以前的失败作为鉴戒。", category: "哲理与智慧" },
+            { text: "将心比心", pinyin: "jiāng xīn bǐ xīn", definition: "拿自己的心去比照别人的心，指遇事设身处地替别人着想。", category: "哲理与智慧" },
+            { text: "因人施教", pinyin: "yīn rén shī jiào", definition: "根据不同对象的具体情况，采取不同的教育方法。", category: "哲理与智慧" },
+            { text: "一蹴而就", pinyin: "yī cù ér jiù", definition: "比喻事情轻而易举，一下子就成功。", category: "结果与影响" },
+            { text: "一劳永逸", pinyin: "yī láo yǒng yì", definition: "辛苦一次，把事情办好，以后就可以永远安逸了。", category: "结果与影响" },
+            { text: "盲目跟风", pinyin: "máng mù gēn fēng", definition: "不问是非，不加思考，跟着别人去做。", category: "行为与行动" },
+            { text: "重蹈覆辙", pinyin: "chóng dǎo fù zhé", definition: "比喻不吸取教训，重犯以前的错误。", category: "行为与行动" },
+            { text: "长此以往", pinyin: "cháng cǐ yǐ wǎng", definition: "老是这样下去（多指不好的情况）。", category: "哲理与智慧" },
+            { text: "未雨绸缪", pinyin: "wèi yǔ chóu móu", definition: "比喻事先做好准备。", category: "哲理与智慧" },
+            { text: "得不偿失", pinyin: "dé bù cháng shī", definition: "得到的补偿不了失去的。", category: "结果与影响" },
+            { text: "覆水难收", pinyin: "fù shuǐ nán shōu", definition: "比喻事已成定局，无法挽回。", category: "结果与影响" },
+            { text: "兼听则明，偏信则暗", pinyin: "jiān tīng zé míng, piān xìn zé àn", definition: "听取多方面的意见，就能明辨是非；只听信单方面的话，就会糊涂。", category: "哲理与智慧" },
+            { text: "人心不足蛇吞象", pinyin: "rén xīn bù zú shé tūn xiàng", definition: "比喻人贪心不足，就像蛇想吞食大象一样。", category: "哲理与智慧" },
+            { text: "得道多助，失道寡助", pinyin: "dé dào duō zhù, shī dào guǎ zhù", definition: "站在正义方面，会得到多数人的支持帮助；逆历史潮流而动，必然陷于孤立。", category: "哲理与智慧" },
+            { text: "见好就收", pinyin: "jiàn hǎo jiù shōu", definition: "看到有利可图就及时收手。", category: "哲理与智慧" },
+            { text: "置之死地而后生", pinyin: "zhì zhī sǐ dì ér hòu shēng", definition: "比喻在绝境中挣扎求生，或在逆境中奋起。", category: "哲理与智慧" },
+            { text: "海纳百川", pinyin: "hǎi nà bǎi chuān", definition: "比喻心胸宽广，能容纳各种不同的人或事物。", category: "人物与品质" },
+            { text: "不拘一格", pinyin: "bù jū yī gé", definition: "不局限于一种规格或方式。", category: "哲理与智慧" },
+            { text: "多快好省", pinyin: "duō kuài hǎo shěng", definition: "数量多，速度快，质量好，成本省。", category: "哲理与智慧" },
+            { text: "空口无凭", pinyin: "kōng kǒu wú píng", definition: "单凭口说，没有证据。", category: "哲理与智慧" },
+            { text: "名不正，言不顺", pinyin: "míng bù zhèng, yán bù shùn", definition: "名分不正，说起话来便不能理直气壮。", category: "哲理与智慧" },
+            { text: "一朝天子，一朝臣", pinyin: "yī cháo tiān zǐ, yī cháo chén", definition: "比喻一个人上台，就换一批自己的人。", category: "哲理与智慧" },
+            { text: "做人留一线，日后好相见", pinyin: "zuò rén liú yī xiàn, rì hòu hǎo xiāng jiàn", definition: "做事不要做得太绝，要给别人留有余地。", category: "哲理与智慧" },
+            { text: "二人同心，其利断金", pinyin: "èr rén tóng xīn, qí lì duàn jīn", definition: "只要两个人一条心，就能发挥很大的力量。", category: "哲理与智慧" },
+            { text: "千里之堤，溃于蚁穴", pinyin: "qiān lǐ zhī dī, kuì yú yǐ xué", definition: "比喻小问题不注意，会造成大祸害。", category: "哲理与智慧" },
+            { text: "量入为出", pinyin: "liàng rù wéi chū", definition: "根据收入的多少来决定开支的限度。", category: "哲理与智慧" },
+            { text: "盛极而衰", pinyin: "shèng jí ér shuāi", definition: "事物发展到顶点，就会向相反方向转化。", category: "哲理与智慧" },
+            { text: "反之亦然", pinyin: "fǎn zhī yì rán", definition: "反过来也是这样。", category: "哲理与智慧" },
+            { text: "因人而异", pinyin: "yīn rén ér yì", definition: "因人的不同而有所差异。", category: "哲理与智慧" },
+            { text: "因事制宜", pinyin: "yīn shì zhì yí", definition: "根据事情的实际情况，采取适当的措施。", category: "哲理与智慧" },
+            { text: "水涨船高", pinyin: "shuǐ zhǎng chuán gāo", definition: "比喻事物随着它所凭借的基础的提高而提高。", category: "哲理与智慧" },
+            { text: "昼夜交替", pinyin: "zhòu yè jiāo tì", definition: "白天和黑夜轮流更换。", category: "状态与情境" },
+            { text: "来龙去脉", pinyin: "lái lóng qù mài", definition: "比喻人、物的来历或事情的前因后果。", category: "哲理与智慧" },
+            { text: "谈之色变", pinyin: "tán zhī sè biàn", definition: "一谈到就脸色变了。形容非常害怕。", category: "心理与情感" },
+            { text: "风花雪月", pinyin: "fēng huā xuě yuè", definition: "原指古典文学作品里描写自然景物的四种对象。后比喻内容空洞，辞藻华丽的诗文，也指爱情之事或花天酒地的生活。", category: "状态与情境" },
+            { text: "一时之侥幸", pinyin: "yī shí zhī jiǎo xìng", definition: "偶然得到的成功或好处。", category: "结果与影响" },
+            { text: "故技重施", pinyin: "gù jì chóng shī", definition: "把老花招或老手法拿出来重新使用。", category: "行为与行动" },
+            { text: "孤注一掷", pinyin: "gū zhù yī zhì", definition: "比喻在危急时用尽所有力量作最后一次冒险。", category: "行为与行动" },
+            { text: "岌岌可危", pinyin: "jí jí kě wēi", definition: "形容非常危险，快要倾覆或灭亡。", category: "状态与情境" },
+            { text: "在劫难逃", pinyin: "zài jié nán táo", definition: "命中注定的灾祸难以逃脱。", category: "状态与情境" },
+            { text: "迫在眉睫", pinyin: "pò zài méi jié", definition: "形容事情已到眼前，十分急迫。", category: "状态与情境" },
+            { text: "里应外合", pinyin: "lǐ yìng wài hé", definition: "外面进攻，内部策应。", category: "行为与行动" },
+            { text: "不思进取", pinyin: "bù sī jìn qǔ", definition: "不考虑上进，不想有所作为。", category: "心理与情感" },
+            { text: "作壁上观", pinyin: "zuò bì shàng guān", definition: "比喻在别人发生冲突时，自己站在一旁看着，不动手帮助任何一方。", category: "行为与行动" },
+            { text: "挺身而出", pinyin: "tǐng shēn ér chū", definition: "形容在危急关头，勇敢地站出来。", category: "行为与行动" },
+            { text: "用人不疑，疑人不用", pinyin: "yòng rén bù yí, yí rén bù yòng", definition: "既然任用他，就要信任他；既然不信任他，就不要任用他。", category: "哲理与智慧" },
+            { text: "腹背受敌", pinyin: "fù bèi shòu dí", definition: "前后都受到敌人的攻击。", category: "状态与情境" },
+            { text: "兵不血刃", pinyin: "bīng bù xuè rèn", definition: "兵器上没有沾血。形容未经战斗就取得了胜利。", category: "结果与影响" },
+            { text: "如法炮制", pinyin: "rú fǎ páo zhì", definition: "本指按照一定的方法制作中药。后比喻照着现成的样子做。", category: "行为与行动" },
+            { text: "推功揽过", pinyin: "tuī gōng lǎn guò", definition: "把功劳推给别人，把过错归于自己。", category: "人物与品质" },
+            { text: "颠倒黑白", pinyin: "diān dǎo hēi bái", definition: "把黑的说成白的，白的说成黑的。比喻歪曲事实，混淆是非。", category: "行为与行动" },
+            { text: "指鹿为马", pinyin: "zhǐ lù wéi mǎ", definition: "比喻故意颠倒黑白，混淆是非。", category: "行为与行动" },
+            { text: "混淆是非", pinyin: "hùn xiáo shì fēi", definition: "故意把正确的说成错误的，把错误的说成正确的。", category: "行为与行动" },
+            { text: "装聋作哑", pinyin: "zhuāng lóng zuò yǎ", definition: "假装聋哑。指故意不理睬，假装不知道。", category: "行为与行动" },
+            { text: "点头哈腰", pinyin: "diǎn tóu hā yāo", definition: "比喻卑躬屈膝，奉承讨好的样子。", category: "行为与行动" },
+            { text: "确凿无疑", pinyin: "què záo wú yí", definition: "证据确实，不容怀疑。", category: "状态与情境" },
+            { text: "滴水不漏", pinyin: "dī shuǐ bù lòu", definition: "一滴水也漏不出来。比喻言行周密，没有丝毫漏洞。", category: "状态与情境" },
+            { text: "养精蓄锐", pinyin: "yǎng jīng xù ruì", definition: "保养精神，积蓄力量。", category: "行为与行动" },
+            { text: "运筹帷幄，决胜千里", pinyin: "yùn chóu wéi wò, jué shèng qiān lǐ", definition: "在军帐内谋划，就能取得千里之外的胜利。泛指善于策划，有全局眼光。", category: "人物与品质" },
+            { text: "此消彼长", pinyin: "cǐ xiāo bǐ zhǎng", definition: "这个衰落，那个就兴盛。", category: "状态与情境" },
+            { text: "引人入胜", pinyin: "yǐn rén rù shèng", definition: "引人进入佳境。现多指风景或文艺作品特别吸引人。", category: "结果与影响" },
+            { text: "居安思危", pinyin: "jū ān sī wēi", definition: "处在安逸的环境中，要想到可能出现的危险。", category: "哲理与智慧" },
+            { text: "力排众议", pinyin: "lì pái zhòng yì", definition: "努力排除各种意见，使自己的主张占上风。", category: "行为与行动" },
+            { text: "匪夷所思", pinyin: "fěi yí suǒ sī", definition: "指事物怪异或言行离奇，不是一般人根据常情所能想象的。", category: "状态与情境" },
+            { text: "牢不可破", pinyin: "láo bù kě pò", definition: "异常坚固，不可摧毁。也用在指人际关系。", category: "状态与情境" },
+            { text: "晓以利害", pinyin: "xiǎo yǐ lì hài", definition: "告诉他事情的好处和坏处。", category: "行为与行动" },
+            { text: "投其所好", pinyin: "tóu qí suǒ hào", definition: "迎合别人的喜好。", category: "行为与行动" },
+            { text: "德薄才浅", pinyin: "dé bó cái qiǎn", definition: "品德、才能都浅薄。常用作谦词。", category: "人物与品质" },
+            { text: "突如其来", pinyin: "tū rú qí lái", definition: "事情出乎意料地发生、出现。", category: "状态与情境" },
+            { text: "应对自如", pinyin: "yìng duì zì rú", definition: "处理事情从容不迫，很轻松。", category: "行为与行动" },
+            { text: "功高盖主", pinyin: "gōng gāo gài zhǔ", definition: "功劳太大，使君主地位受到威胁而心有疑忌。", category: "状态与情境" },
+            { text: "欲戴王冠，必承其重", pinyin: "yù dài wáng guān, bì chéng qí zhòng", definition: "要想戴上王冠，就必须承受它的重量。比喻要想获得多大的荣誉，就必须承担多大的责任。", category: "哲理与智慧" },
+            { text: "暴露无遗", pinyin: "bào lù wú yí", definition: "全部暴露出来，一点也没剩下。", category: "结果与影响" },
+            { text: "天有不测风云，人有旦夕祸福", pinyin: "tiān yǒu bù cè fēng yún, rén yǒu dàn xī huò fú", definition: "比喻有些灾祸的发生，是无法预料的。", category: "哲理与智慧" },
+            { text: "束手无策", pinyin: "shù shǒu wú cè", definition: "比喻碰到问题，就象手被捆住一样，一点办法也没有。", category: "状态与情境" },
+            { text: "得心应手", pinyin: "dé xīn yìng shǒu", definition: "心里怎么想，手就能怎么做。比喻技艺纯熟或做事情非常顺利。", category: "状态与情境" },
+            { text: "言传身教", pinyin: "yán chuán shēn jiào", definition: "一面在言语上进行教育，一面在行动上做出表率。", category: "行为与行动" },
+            { text: "寥若晨星", pinyin: "liáo ruò chén xīng", definition: "稀少得好像早晨的星星。", category: "状态与情境" },
+            { text: "凤毛麟角", pinyin: "fèng máo lín jiǎo", definition: "比喻珍贵而稀少的人或物。", category: "状态与情境" },
+            { text: "插科打诨", pinyin: "chā kē dǎ hùn", definition: "指戏曲演员在表演中插入一些滑稽的动作和诙谐的语言来引人发笑。", category: "行为与行动" },
+            { text: "高瞻远瞩", pinyin: "gāo zhān yuǎn zhǔ", definition: "站得高，看得远。比喻眼光远大。", category: "人物与品质" },
+            { text: "如虎添翼", pinyin: "rú hǔ tiān yì", definition: "好像老虎长上了翅膀。比喻强有力的人得到帮助变得更加强有力。", category: "结果与影响" },
+            { text: "强词夺理", pinyin: "qiǎng cí duó lǐ", definition: "没有理硬说成有理。", category: "行为与行动" },
+            { text: "水落石出", pinyin: "shuǐ luò shí chū", definition: "比喻事情的真相完全显露出来。", category: "结果与影响" },
+            { text: "冰冻三尺，非一日之寒", pinyin: "bīng dòng sān chǐ, fēi yī rì zhī hán", definition: "比喻一种情况的形成，是经过长时间的积累、酝酿的。", category: "哲理与智慧" },
+        ];
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('idiom-grid');
+            const searchInput = document.getElementById('search-input');
+            const noResults = document.getElementById('no-results');
+            const idiomCount = document.getElementById('idiom-count');
+            const modal = document.getElementById('idiom-modal');
+            const closeModalBtn = document.getElementById('close-modal');
+            const modalBackdrop = modal;
+
+            const modalIdiom = document.getElementById('modal-idiom');
+            const modalPinyin = document.getElementById('modal-pinyin');
+            const modalDefinition = document.getElementById('modal-definition');
+            const modalCategory = document.getElementById('modal-category');
+            
+            const categoryFiltersContainer = document.getElementById('category-filters');
+            
+            const categories = [...new Set(idioms.map(item => item.category))];
+            
+            const categoryColors = {
+                '状态与情境': 'rgba(255, 99, 132, 0.7)',
+                '行为与行动': 'rgba(54, 162, 235, 0.7)',
+                '心理与情感': 'rgba(255, 206, 86, 0.7)',
+                '人物与品质': 'rgba(75, 192, 192, 0.7)',
+                '结果与影响': 'rgba(153, 102, 255, 0.7)',
+                '哲理与智慧': 'rgba(255, 159, 64, 0.7)',
+            };
+            const categoryHoverColors = {
+                '状态与情境': 'rgba(255, 99, 132, 1)',
+                '行为与行动': 'rgba(54, 162, 235, 1)',
+                '心理与情感': 'rgba(255, 206, 86, 1)',
+                '人物与品质': 'rgba(75, 192, 192, 1)',
+                '结果与影响': 'rgba(153, 102, 255, 1)',
+                '哲理与智慧': 'rgba(255, 159, 64, 1)',
+            };
+
+
+            function setupChart() {
+                const ctx = document.getElementById('idioms-chart').getContext('2d');
+                const categoryCounts = categories.map(cat => idioms.filter(i => i.category === cat).length);
+                
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: categories,
+                        datasets: [{
+                            label: '成语数量',
+                            data: categoryCounts,
+                            backgroundColor: categories.map(cat => categoryColors[cat] || 'rgba(201, 203, 207, 0.7)'),
+                            hoverBackgroundColor: categories.map(cat => categoryHoverColors[cat] || 'rgba(201, 203, 207, 1)'),
+                            borderColor: '#FDFBF8',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: {
+                                    boxWidth: 20,
+                                    padding: 15,
+                                    font: {
+                                        family: "'Noto Sans SC', sans-serif",
+                                        size: 14
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                titleFont: {
+                                     family: "'Noto Sans SC', sans-serif"
+                                },
+                                bodyFont: {
+                                     family: "'Noto Sans SC', sans-serif"
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function setupCategoryFilters() {
+                 const allButton = document.createElement('button');
+                 allButton.textContent = '所有分类';
+                 allButton.className = 'btn-category active w-full text-left p-3 rounded-lg bg-stone-200 hover:bg-stone-300 transition';
+                 allButton.dataset.category = 'all';
+                 categoryFiltersContainer.appendChild(allButton);
+
+                 categories.forEach(category => {
+                     const button = document.createElement('button');
+                     button.textContent = category;
+                     button.className = 'btn-category w-full text-left p-3 rounded-lg bg-stone-200 hover:bg-stone-300 transition';
+                     button.dataset.category = category;
+                     categoryFiltersContainer.appendChild(button);
+                 });
+                 
+                 categoryFiltersContainer.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON') {
+                        document.querySelectorAll('.btn-category').forEach(btn => btn.classList.remove('active'));
+                        e.target.classList.add('active');
+                        const category = e.target.dataset.category;
+                        filterIdioms(searchInput.value, category);
+                    }
+                 });
+            }
+
+            function renderIdioms(filteredIdioms) {
+                grid.innerHTML = '';
+                if (filteredIdioms.length === 0) {
+                    noResults.classList.remove('hidden');
+                    grid.classList.add('hidden');
+                } else {
+                    noResults.classList.add('hidden');
+                    grid.classList.remove('hidden');
+                }
+                
+                idiomCount.textContent = `共 ${filteredIdioms.length} 条`;
+
+                filteredIdioms.forEach((idiom, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'card bg-white p-4 rounded-lg shadow-sm cursor-pointer text-center flex items-center justify-center';
+                    card.textContent = idiom.text;
+                    card.dataset.index = idioms.indexOf(idiom);
+                    grid.appendChild(card);
+                });
+            }
+
+            function filterIdioms(searchTerm, category = 'all') {
+                const currentActiveCategory = document.querySelector('.btn-category.active')?.dataset.category || 'all';
+                category = category === 'all' ? currentActiveCategory : category;
+
+                const lowercasedTerm = searchTerm.toLowerCase();
+                const filtered = idioms.filter(idiom => {
+                    const matchesCategory = category === 'all' || idiom.category === category;
+                    const matchesSearch = idiom.text.includes(lowercasedTerm) || idiom.pinyin.toLowerCase().includes(lowercasedTerm) || idiom.definition.includes(lowercasedTerm);
+                    return matchesCategory && matchesSearch;
+                });
+                renderIdioms(filtered);
+            }
+
+            function showModal(idiom) {
+                modalIdiom.textContent = idiom.text;
+                modalPinyin.textContent = idiom.pinyin;
+                modalDefinition.textContent = idiom.definition;
+                modalCategory.textContent = idiom.category;
+                
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.querySelector('.modal-content').classList.remove('scale-95');
+            }
+
+            function hideModal() {
+                modal.classList.add('opacity-0');
+                modal.querySelector('.modal-content').classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('pointer-events-none');
+                }, 300);
+            }
+
+            searchInput.addEventListener('input', (e) => {
+                 const activeCategory = document.querySelector('.btn-category.active').dataset.category;
+                 filterIdioms(e.target.value, activeCategory);
+            });
+
+            grid.addEventListener('click', (e) => {
+                if (e.target.classList.contains('card')) {
+                    const index = e.target.dataset.index;
+                    showModal(idioms[index]);
+                }
+            });
+            
+            closeModalBtn.addEventListener('click', hideModal);
+            modalBackdrop.addEventListener('click', (e) => {
+                if (e.target === modalBackdrop) {
+                    hideModal();
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && !modal.classList.contains('pointer-events-none')) {
+                    hideModal();
+                }
+            });
+            
+            setupCategoryFilters();
+            renderIdioms(idioms);
+            setupChart();
+        });
+
+    </script>
+</body>
+</html>
