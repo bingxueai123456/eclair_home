@@ -773,6 +773,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'storymotion，通过excaldraw可以制作视频',
     rating: 7,
+  },{
+    id:92,
+    title: 'malai 代理 TCP',
+    url: 'https://malai.sh/tcp/',
+    mainCategory: ' 研发',
+    subCategory: '开发工具',
+    description: '一个命令行工具，将本机的 TCP 端口分享出去。',
+    rating: 7,
   }
 
   
