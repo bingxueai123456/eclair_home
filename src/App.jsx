@@ -781,6 +781,14 @@ const initialLinks = [
     subCategory: '开发工具',
     description: '一个命令行工具，将本机的 TCP 端口分享出去。',
     rating: 7,
+  },{
+    id:93,
+    title: '量化交易 Qbot',
+    url: 'https://github.com/UFund-Me/Qbot',
+    mainCategory: ' 研发',
+    subCategory: '其他',
+    description: '量化交易 Qbot',
+    rating: 7,
   }
 
   
