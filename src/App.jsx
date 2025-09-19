@@ -789,6 +789,14 @@ const initialLinks = [
     subCategory: '其他',
     description: '量化交易 Qbot',
     rating: 7,
+  },{
+    id:94,
+    title: 'highlight 监控平台',
+    url: 'https://github.com/highlight/highlight?tab=readme-ov-file',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'highlight 监控平台',
+    rating: 7,
   }
 
   
