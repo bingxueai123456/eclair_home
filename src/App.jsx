@@ -797,6 +797,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'highlight 监控平台',
     rating: 7,
+  },{
+    id:95,
+    title: '了解你的设备指纹',
+    url: 'https://fingerprint.goldenowl.ai/',
+    mainCategory: '研发',
+    subCategory: '其他',
+    description: '了解到当前你访问一个网页可以收集到的你的哪些信息',
+    rating: 7,
   }
 
   
