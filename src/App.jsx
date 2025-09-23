@@ -805,6 +805,22 @@ const initialLinks = [
     subCategory: '其他',
     description: '了解到当前你访问一个网页可以收集到的你的哪些信息',
     rating: 7,
+  },{
+    id:96,
+    title: 'whalewisdom',
+    url: 'https://whalewisdom.com/',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: 'whalewisdom，可以查询基金信息，持仓人信息',
+    rating: 7,
+  },{
+    id:97,
+    title: 'dataroma',
+    url: 'https://www.dataroma.com/m/home.php',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: 'dataroma查看顶级投资人持仓',
+    rating: 7,
   }
 
   
