@@ -821,6 +821,14 @@ const initialLinks = [
     subCategory: '经济',
     description: 'dataroma查看顶级投资人持仓',
     rating: 7,
+  },{
+    id:98,
+    title: 'WhisperLiveKit',
+    url: 'https://github.com/QuentinFuxa/WhisperLiveKit',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'WhisperLiveKit，开箱即用的声音转文字软件',
+    rating: 7,
   }
 
   
