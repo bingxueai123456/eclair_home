@@ -829,6 +829,30 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'WhisperLiveKit，开箱即用的声音转文字软件',
     rating: 7,
+  },{
+    id:99,
+    title: 'mole',
+    url: 'https://github.com/tw93/mole',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'mole用来清理 MAC 垃圾',
+    rating: 7,
+  },{
+    id:100,
+    title: 'subtitleedit',
+    url: 'https://github.com/SubtitleEdit/subtitleedit',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'subtitleedit，一个视频字幕编辑器',
+    rating: 7,
+  },{
+    id:101,
+    title: 'platypus',
+    url: 'https://sveinbjorn.org/platypus',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'platypus，一个macOS应用程序打包工具,可以打包 shell 脚本，python 等等',
+    rating: 7,
   }
 
   
@@ -972,12 +996,12 @@ const initialBlogs = [
     tags: ['地图服务', '对比']
   },{
     id: 5,
-    title: '成语',
-    url: '/html/成语.html',
-    description: '成语',
-    category: '成语',
+    title: '非洲支付',
+    url: '/html/非洲支付.html',
+    description: '非洲支付',
+    category: '支付',
     date: '2025-07-11',
-    tags: ['成语', '解释']
+    tags: ['支付', '非洲']
   }
   // 可以继续在这里添加更多博客文章
 ]
