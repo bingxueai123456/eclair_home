@@ -853,6 +853,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'platypus，一个macOS应用程序打包工具,可以打包 shell 脚本，python 等等',
     rating: 7,
+  },{
+    id:102,
+    title: 'fscan',
+    url: 'https://github.com/shadow1ng/fscan',
+    mainCategory: 'github',
+    subCategory: '开发工具',
+    description: 'fscan，一个快速扫描工具，可以扫描端口，服务，域名，子域名，等等',
+    rating: 7,
   }
 
   
