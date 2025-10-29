@@ -861,6 +861,14 @@ const initialLinks = [
     subCategory: '开发工具',
     description: 'fscan，一个快速扫描工具，可以扫描端口，服务，域名，子域名，等等',
     rating: 7,
+  },{
+    id:103,
+    title: 'handy',
+    url: 'https://github.com/cjpais/Handy?tab=readme-ov-file',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: '语音转文字',
+    rating: 7,
   }
 
   
