@@ -869,6 +869,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: '语音转文字',
     rating: 7,
+  },{
+    id:104,
+    title: 'xcodeReviewer',
+    url: 'https://github.com/lintsinghua/XCodeReviewer',
+    mainCategory: 'github',
+    subCategory: '工具类',
+    description: 'XCodeReviewer，使用大模型来审查代码',
+    rating: 7,
   }
 
   
