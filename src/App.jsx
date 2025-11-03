@@ -11,7 +11,8 @@ import {
   faFileText,
   faSync,
   faSpinner,
-  faRss
+  faRss,
+  faSignOutAlt
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons'
@@ -19,6 +20,7 @@ import './App.css'
 import useYoutubeRssFeed from './useYoutubeRssFeed'
 import useRssManager from './useRssManager'
 import { useGlobalSearch, SearchResults } from './useGlobalSearch'
+import Login from './Login'
 
 const initialLinks = [
   {
@@ -1340,6 +1342,8 @@ function BlogCollection() {
 }
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   const [links, setLinks] = useState(initialLinks)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedMainCategory, setSelectedMainCategory] = useState('研发')
@@ -1352,6 +1356,41 @@ function App() {
   const [currentGradient, setCurrentGradient] = useState(gradientPresets[0])
   const [activeMenu, setActiveMenu] = useState('main') // 默认打开主页面
   
+  // 登出处理
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn')
+    localStorage.removeItem('loginExpireTime')
+    localStorage.removeItem('username')
+    setIsLoggedIn(false)
+  }
+
+  // 登录成功处理
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true)
+  }
+
+  // 检查登录状态
+  useEffect(() => {
+    const checkAuth = () => {
+      const loggedIn = localStorage.getItem('isLoggedIn')
+      const expireTime = localStorage.getItem('loginExpireTime')
+      
+      if (loggedIn === 'true' && expireTime) {
+        const now = new Date().getTime()
+        if (now < parseInt(expireTime)) {
+          setIsLoggedIn(true)
+        } else {
+          // 登录已过期
+          handleLogout()
+        }
+      }
+      setIsCheckingAuth(false)
+    }
+    
+    checkAuth()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // 获取YouTube数据
   const { feeds: youtubeFeeds, loading: youtubeLoading, error: youtubeError, lastFetch, refresh } = useYoutubeRssFeed()
   
@@ -1536,6 +1575,16 @@ function App() {
     )
   }
 
+  // 如果正在检查登录状态，显示加载
+  if (isCheckingAuth) {
+    return null
+  }
+
+  // 如果未登录，显示登录页面
+  if (!isLoggedIn) {
+    return <Login onLoginSuccess={handleLoginSuccess} />
+  }
+
   return (
     <div className={`app-container theme-${currentTheme}`} data-theme={currentTheme}>
       {/* 移动端菜单按钮 */}
@@ -1587,6 +1636,14 @@ function App() {
         <div className="sidebar-header">
           <h2>Eclair Collection</h2>
           <p>想想你为什么活着</p>
+          <button 
+            className="logout-btn"
+            onClick={handleLogout}
+            title="退出登录"
+          >
+            <FontAwesomeIcon icon={faSignOutAlt} />
+            退出登录
+          </button>
         </div>
         
         <div className="search-bar">
