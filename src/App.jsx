@@ -879,6 +879,14 @@ const initialLinks = [
     subCategory: '工具类',
     description: 'XCodeReviewer，使用大模型来审查代码',
     rating: 7,
+  },{
+    id:105,
+    title: 'atomfair电池知识',
+    url: 'https://atomfair.com/battery-equipment-and-instrument/index.php',
+    mainCategory: '研发',
+    subCategory: '其他',
+    description: '包含电池相关的很多技术',
+    rating: 7,
   }
 
   
