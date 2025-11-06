@@ -1270,7 +1270,7 @@ function YoutubeSubs({ feeds, loading, error, lastFetch, onRefresh }) {
   )
 }
 
-function BlogCollection() {
+function BlogCollection({ onBlogClick }) {
   const [blogs] = useState(initialBlogs)
   const [selectedCategory, setSelectedCategory] = useState('全部')
 
@@ -1338,10 +1338,7 @@ function BlogCollection() {
               
               <div className="blog-actions">
                 <button 
-                  onClick={() => {
-                    setCurrentBlogUrl(blog.url)
-                    setActiveMenu('blog-viewer')
-                  }}
+                  onClick={() => onBlogClick(blog.url)}
                   className="blog-read-btn"
                 >
                   <FontAwesomeIcon icon={faFileText} />
@@ -1858,7 +1855,14 @@ function App() {
             onRefreshSingle={refreshSingleFeed}
           />
         )}
-        {activeMenu === 'blog' && <BlogCollection />}
+        {activeMenu === 'blog' && (
+          <BlogCollection 
+            onBlogClick={(url) => {
+              setCurrentBlogUrl(url)
+              setActiveMenu('blog-viewer')
+            }}
+          />
+        )}
         {activeMenu === 'blog-viewer' && (
           <div className="blog-viewer">
             <div className="blog-viewer-header">
