@@ -1337,15 +1337,16 @@ function BlogCollection() {
               <p className="blog-description">{blog.description}</p>
               
               <div className="blog-actions">
-                <a 
-                  href={blog.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
+                <button 
+                  onClick={() => {
+                    setCurrentBlogUrl(blog.url)
+                    setActiveMenu('blog-viewer')
+                  }}
                   className="blog-read-btn"
                 >
                   <FontAwesomeIcon icon={faFileText} />
                   阅读文章
-                </a>
+                </button>
               </div>
             </div>
           ))
@@ -1379,6 +1380,7 @@ function App() {
   const [showGradientPicker, setShowGradientPicker] = useState(false)
   const [currentGradient, setCurrentGradient] = useState(gradientPresets[0])
   const [activeMenu, setActiveMenu] = useState('main') // 默认打开主页面
+  const [currentBlogUrl, setCurrentBlogUrl] = useState('')
   
   // 登出处理
   const handleLogout = () => {
@@ -1857,6 +1859,25 @@ function App() {
           />
         )}
         {activeMenu === 'blog' && <BlogCollection />}
+        {activeMenu === 'blog-viewer' && (
+          <div className="blog-viewer">
+            <div className="blog-viewer-header">
+              <button 
+                className="back-btn"
+                onClick={() => setActiveMenu('blog')}
+              >
+                <FontAwesomeIcon icon={faChevronDown} style={{ transform: 'rotate(90deg)' }} />
+                返回博客列表
+              </button>
+            </div>
+            <iframe 
+              src={currentBlogUrl}
+              className="blog-iframe"
+              title="博客内容"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+            />
+          </div>
+        )}
       </main>
     </div>
   )
