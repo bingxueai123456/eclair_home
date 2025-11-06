@@ -887,6 +887,14 @@ const initialLinks = [
     subCategory: '其他',
     description: '包含电池相关的很多技术',
     rating: 7,
+  },{
+    id:106,
+    title: 'bark iphone通知',
+    url: 'https://bark.day.app/#/?id=bark/',
+    mainCategory: '研发',
+    subCategory: '后端',
+    description: 'bark iphone通知，可以发送通知到iphone',
+    rating: 7,
   }
 
   
