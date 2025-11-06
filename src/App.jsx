@@ -1044,6 +1044,14 @@ const initialBlogs = [
     category: '支付',
     date: '2025-07-11',
     tags: ['支付', '非洲']
+  },{
+    id: 6,
+    title: '债券投资的宏观周期指南',
+    url: '/html/债券投资的宏观周期指南.html',
+    description: '债券投资的宏观周期指南',
+    category: '经济分析',
+    date: '2025-07-11',
+    tags: ['经济', '债券', '宏观周期']
   }
   // 可以继续在这里添加更多博客文章
 ]
