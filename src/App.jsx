@@ -895,6 +895,14 @@ const initialLinks = [
     subCategory: '后端',
     description: 'bark iphone通知，可以发送通知到iphone',
     rating: 7,
+  },{
+    id:107,
+    title: 'ai资讯网站',
+    url: 'https://zara.faces.site/ai',
+    mainCategory: '研发',
+    subCategory: 'AI',
+    description: 'ai资讯网站',
+    rating: 7,
   }
 
   
