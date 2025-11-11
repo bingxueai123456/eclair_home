@@ -137,7 +137,7 @@
       background: #f8fafc;
       border-radius: 0.5rem;
       padding: 1rem;
-      min-height: 1000px; /* 更改：增加高度以容纳10个步骤 */
+      min-height: 500px; /* 默认最小高度，将通过JS动态调整 */
     }
 
     .lifeline {
@@ -351,6 +351,58 @@
       color: white;
     }
 
+    .speed-control {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .speed-control label {
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .speed-slider {
+      width: 300px;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 5px;
+      outline: none;
+    }
+
+    .speed-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #3b82f6;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .speed-slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: #3b82f6;
+      border-radius: 50%;
+      cursor: pointer;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .speed-value {
+      color: #bfdbfe;
+      font-weight: 600;
+      min-width: 80px;
+      text-align: center;
+    }
+
     .features {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -469,6 +521,13 @@
       </div>
     </div>
 
+    <!-- 速度控制 -->
+    <div class="speed-control">
+      <label for="speedSlider">播放速度：</label>
+      <input type="range" id="speedSlider" class="speed-slider" min="0" max="4" value="2" step="1" oninput="updateSpeed(this.value)">
+      <span class="speed-value" id="speedValue">1.0x</span>
+    </div>
+
     <!-- 控制按钮 --><div class="controls">
       <button class="control-btn play" onclick="play()">
         ▶ 播放
@@ -544,6 +603,7 @@
     let currentStep = 0;
     let isPlaying = false;
     let timer = null;
+    let playbackSpeed = 1.0; // 播放速度倍率
 
     function getSteps() {
       if (currentPhase === 'prepare') return prepareSteps;
@@ -583,6 +643,10 @@
       const steps = getSteps();
       // 根据步骤数量动态调整间距
       const stepVerticalSpacing = steps.length > 8 ? 75 : 90;
+      
+      // 动态设置时序图高度：起始位置 + 步骤数 × 间距 + 底部留白
+      const timelineHeight = 40 + steps.length * stepVerticalSpacing + 100;
+      area.style.minHeight = timelineHeight + 'px';
       
       steps.forEach((step, index) => {
         const messageDiv = document.createElement('div');
@@ -681,10 +745,18 @@
          isPlaying = true;
          document.querySelector('.control-btn.play').disabled = true;
          document.querySelector('.control-btn.pause').disabled = false;
-         // 如果是第一次播放或者从暂停恢复，立即显示当前步骤，然后等待 2 秒进入下一步
+         
+         // 如果速度是立即显示，直接显示所有步骤
+         if (playbackSpeed === 0) {
+           showAllSteps();
+           return;
+         }
+         
+         // 否则按速度播放
          renderTimeline();
          updateDetailCard();
-         timer = setTimeout(nextStep, 2000);
+         const delay = 2000 / playbackSpeed; // 根据速度调整延迟
+         timer = setTimeout(nextStep, delay);
          return;
       }
       // 如果已经在播放，play按钮不应该被点击，但为防止意外，这里不做操作
@@ -705,7 +777,40 @@
       renderTimeline();
       updateDetailCard();
 
-      timer = setTimeout(nextStep, 2000);
+      const delay = 2000 / playbackSpeed; // 根据速度调整延迟
+      timer = setTimeout(nextStep, delay);
+    }
+
+    function showAllSteps() {
+      const steps = getSteps();
+      currentStep = steps.length - 1;
+      renderTimeline();
+      updateDetailCard();
+      pause();
+    }
+
+    function updateSpeed(value) {
+      const speedMap = {
+        '0': { speed: 0.5, label: '0.5x' },
+        '1': { speed: 0.75, label: '0.75x' },
+        '2': { speed: 1.0, label: '1.0x' },
+        '3': { speed: 2.0, label: '2.0x' },
+        '4': { speed: 0, label: '立即' }
+      };
+      
+      const config = speedMap[value];
+      playbackSpeed = config.speed;
+      document.getElementById('speedValue').textContent = config.label;
+      
+      // 如果正在播放，重新计算定时器
+      if (isPlaying && playbackSpeed > 0) {
+        clearTimeout(timer);
+        const delay = 2000 / playbackSpeed;
+        timer = setTimeout(nextStep, delay);
+      } else if (isPlaying && playbackSpeed === 0) {
+        clearTimeout(timer);
+        showAllSteps();
+      }
     }
 
     function pause() {
