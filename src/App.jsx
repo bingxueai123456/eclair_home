@@ -1060,6 +1060,14 @@ const initialBlogs = [
     category: '经济分析',
     date: '2025-07-11',
     tags: ['经济', '债券', '宏观周期']
+  },{
+    id: 7,
+    title: 'JWT 离线换电',
+    url: '/html/JWT 离线换电.html',
+    description: 'JWT 离线换电',
+    category: '经济分析',
+    date: '2025-07-11',
+    tags: [ 'JWT', '离线换电']
   }
   // 可以继续在这里添加更多博客文章
 ]
