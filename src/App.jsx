@@ -903,6 +903,14 @@ const initialLinks = [
     subCategory: 'AI',
     description: 'ai资讯网站',
     rating: 7,
+  },{
+    id:108,
+    title: '预测市场，看分布',
+    url: 'https://polymarket.com/new',
+    mainCategory: '新闻/周刊',
+    subCategory: '经济',
+    description: '预测市场，看分布',
+    rating: 7,
   }
 
   
