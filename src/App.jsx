@@ -1076,6 +1076,14 @@ const initialBlogs = [
     category: '经济分析',
     date: '2025-07-11',
     tags: [ 'JWT', '离线换电']
+  },{
+    id:8,
+    title: '换电柜软件解决方案',
+    url: '/html/换电柜软件解决方案.html',
+    description: '换电柜软件解决方案',
+    category: '经济分析',
+    date: '2025-07-11',
+    tags: ['换电柜', '软件', '解决方案']
   }
   // 可以继续在这里添加更多博客文章
 ]
