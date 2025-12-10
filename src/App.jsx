@@ -911,6 +911,14 @@ const initialLinks = [
     subCategory: '经济',
     description: '预测市场，看分布',
     rating: 7,
+  },{
+    id:109,
+    title: 'codewiki.google',
+    url: 'https://codewiki.google.com/',
+    mainCategory: '研发',
+    subCategory: 'AI',
+    description: 'codewiki.google，一个谷歌的代码wiki，可以查看各种代码的实现原理',
+    rating: 7,
   }
 
   
