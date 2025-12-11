@@ -116,7 +116,7 @@ const Login = ({ onLoginSuccess }) => {
         </form>
 
         <div className="login-footer">
-          <p>想想你为什么活着</p>
+          <p>LIVE</p>
         </div>
       </div>
     </div>

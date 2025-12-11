@@ -12,7 +12,8 @@ import {
   faSync,
   faSpinner,
   faRss,
-  faSignOutAlt
+  faSignOutAlt,
+  faUser
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons'
@@ -1473,6 +1474,13 @@ function App() {
         setActiveMenu('blog')
       }
       setIsCheckingAuth(false)
+      
+      // 调试信息
+      console.log('Auth check complete:', {
+        isLoggedIn: loggedIn === 'true',
+        activeMenu: loggedIn === 'true' ? 'main' : 'blog',
+        currentPath
+      })
     }
     
     checkAuth()
@@ -1673,7 +1681,11 @@ function App() {
 
   // 如果正在检查登录状态，显示加载
   if (isCheckingAuth) {
-    return null
+    return (
+      <div className="loading-screen">
+        <div className="loading-spinner"></div>
+      </div>
+    )
   }
 
   // 如果未登录且尝试访问需要登录的功能，显示登录页面
@@ -1732,7 +1744,7 @@ function App() {
       <aside className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
           <h2>Eclair Collection</h2>
-          <p>想想你为什么活着</p>
+          <p>LIVE</p>
           {isLoggedIn && (
             <button 
               className="logout-btn"
@@ -1744,15 +1756,20 @@ function App() {
             </button>
           )}
           {!isLoggedIn && (
-            <button 
-              className="login-btn"
-              onClick={() => setActiveMenu('login-required')}
-              title="登录以解锁更多功能"
-            >
-              <FontAwesomeIcon icon={faUser} />
-              <span>登录</span>
-              <div className="login-btn-shine"></div>
-            </button>
+            <>
+              <div className="login-prompt">
+                <p>登录以解锁更多功能</p>
+              </div>
+              <button 
+                className="login-btn"
+                onClick={() => setActiveMenu('login-required')}
+                title="登录以解锁更多功能"
+              >
+                <FontAwesomeIcon icon={faUser} />
+                <span>登录</span>
+                <div className="login-btn-shine"></div>
+              </button>
+            </>
           )}
         </div>
         
@@ -1895,6 +1912,8 @@ function App() {
       </aside>
 
       <main className="main-content">
+
+        
         {activeMenu === 'search' && (
           <SearchResults 
             searchResults={searchResults}
@@ -1968,6 +1987,12 @@ function App() {
         )}
         {activeMenu === 'blog' && (
           <BlogCollection />
+        )}
+        {/* 未登录用户提示 */}
+        {!isLoggedIn && activeMenu === 'blog' && (
+          <div className="guest-notice">
+            <p>💡 当前以访客模式浏览博客，<button onClick={() => setActiveMenu('login-required')} className="inline-login-link">登录</button>以解锁更多功能</p>
+          </div>
         )}
       </main>
     </div>
