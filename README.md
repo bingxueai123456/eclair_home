@@ -10,7 +10,7 @@
 </div>
 
 <p align="center">
-  <strong>想想你为什么活着</strong> - 一个现代化的个人内容聚合平台
+  <strong>LIVE</strong> - 一个现代化的个人内容聚合平台
 </p>
 
 ## 📖 项目简介

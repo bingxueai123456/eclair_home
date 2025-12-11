@@ -1318,7 +1318,7 @@ function YoutubeSubs({ feeds, loading, error, lastFetch, onRefresh }) {
   )
 }
 
-function BlogCollection({ onBlogClick }) {
+function BlogCollection() {
   const [blogs] = useState(initialBlogs)
   const [selectedCategory, setSelectedCategory] = useState('全部')
 
@@ -1385,13 +1385,15 @@ function BlogCollection({ onBlogClick }) {
               <p className="blog-description">{blog.description}</p>
               
               <div className="blog-actions">
-                <button 
-                  onClick={() => onBlogClick(blog.url)}
+                <a 
+                  href={blog.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="blog-read-btn"
                 >
                   <FontAwesomeIcon icon={faFileText} />
                   阅读文章
-                </button>
+                </a>
               </div>
             </div>
           ))
@@ -1424,8 +1426,7 @@ function App() {
   const [currentTheme, setCurrentTheme] = useState('light')
   const [showGradientPicker, setShowGradientPicker] = useState(false)
   const [currentGradient, setCurrentGradient] = useState(gradientPresets[0])
-  const [activeMenu, setActiveMenu] = useState('blog') // 默认打开博客页面（允许未登录访问）
-  const [currentBlogUrl, setCurrentBlogUrl] = useState('')
+  const [activeMenu, setActiveMenu] = useState('blog') // 初始默认博客页面，登录检查后会自动切换
   
   // 登出处理
   const handleLogout = () => {
@@ -1438,6 +1439,8 @@ function App() {
   // 登录成功处理
   const handleLoginSuccess = () => {
     setIsLoggedIn(true)
+    // 登录成功后跳转到主页
+    setActiveMenu('main')
   }
 
   // 检查登录状态
@@ -1458,10 +1461,16 @@ function App() {
         const now = new Date().getTime()
         if (now < parseInt(expireTime)) {
           setIsLoggedIn(true)
+          // 如果已登录，跳转到主页
+          setActiveMenu('main')
         } else {
           // 登录已过期
           handleLogout()
+          setActiveMenu('blog') // 未登录显示博客页
         }
+      } else {
+        // 未登录，保持在博客页
+        setActiveMenu('blog')
       }
       setIsCheckingAuth(false)
     }
@@ -1472,7 +1481,7 @@ function App() {
 
   // 检查是否可以访问当前菜单（博客相关功能允许未登录访问）
   const canAccessMenu = (menu) => {
-    if (menu === 'blog' || menu === 'blog-viewer') {
+    if (menu === 'blog') {
       return true // 博客功能允许未登录访问
     }
     return isLoggedIn // 其他功能需要登录
@@ -1668,7 +1677,7 @@ function App() {
   }
 
   // 如果未登录且尝试访问需要登录的功能，显示登录页面
-  // 博客相关功能（blog 和 blog-viewer）允许未登录访问
+  // 博客功能（blog）允许未登录访问
   if (!isLoggedIn && (activeMenu === 'login-required' || !canAccessMenu(activeMenu))) {
     return <Login onLoginSuccess={handleLoginSuccess} />
   }
@@ -1738,9 +1747,11 @@ function App() {
             <button 
               className="login-btn"
               onClick={() => setActiveMenu('login-required')}
-              title="登录"
+              title="登录以解锁更多功能"
             >
-              登录
+              <FontAwesomeIcon icon={faUser} />
+              <span>登录</span>
+              <div className="login-btn-shine"></div>
             </button>
           )}
         </div>
@@ -1956,31 +1967,7 @@ function App() {
           />
         )}
         {activeMenu === 'blog' && (
-          <BlogCollection 
-            onBlogClick={(url) => {
-              setCurrentBlogUrl(url)
-              setActiveMenu('blog-viewer')
-            }}
-          />
-        )}
-        {activeMenu === 'blog-viewer' && (
-          <div className="blog-viewer">
-            <div className="blog-viewer-header">
-              <button 
-                className="back-btn"
-                onClick={() => setActiveMenu('blog')}
-              >
-                <FontAwesomeIcon icon={faChevronDown} style={{ transform: 'rotate(90deg)' }} />
-                返回博客列表
-              </button>
-            </div>
-            <iframe 
-              src={currentBlogUrl}
-              className="blog-iframe"
-              title="博客内容"
-              sandbox="allow-scripts allow-scripts allow-same-origin allow-popups allow-forms"
-            />
-          </div>
+          <BlogCollection />
         )}
       </main>
     </div>
