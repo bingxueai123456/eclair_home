@@ -1092,7 +1092,15 @@ const initialBlogs = [
     category: '经济分析',
     date: '2025-07-11',
     tags: ['换电柜', '软件', '解决方案']
-  }
+  },{
+    id:9,
+    title: '换电柜对接方案',
+    url: '/html/换电柜对接方案.html',
+    description: '换电柜对接方案',
+    category: '经济分析',
+    date: '2025-07-11',
+    tags: ['换电柜', '对接', '方案']
+  },
   // 可以继续在这里添加更多博客文章
 ]
 
@@ -1416,7 +1424,7 @@ function App() {
   const [currentTheme, setCurrentTheme] = useState('light')
   const [showGradientPicker, setShowGradientPicker] = useState(false)
   const [currentGradient, setCurrentGradient] = useState(gradientPresets[0])
-  const [activeMenu, setActiveMenu] = useState('main') // 默认打开主页面
+  const [activeMenu, setActiveMenu] = useState('blog') // 默认打开博客页面（允许未登录访问）
   const [currentBlogUrl, setCurrentBlogUrl] = useState('')
   
   // 登出处理
@@ -1435,6 +1443,14 @@ function App() {
   // 检查登录状态
   useEffect(() => {
     const checkAuth = () => {
+      // 如果访问的是 /html/ 目录下的文件，允许直接访问，不需要登录
+      const currentPath = window.location.pathname
+      if (currentPath.startsWith('/html/')) {
+        setIsLoggedIn(true)
+        setIsCheckingAuth(false)
+        return
+      }
+      
       const loggedIn = localStorage.getItem('isLoggedIn')
       const expireTime = localStorage.getItem('loginExpireTime')
       
@@ -1453,6 +1469,14 @@ function App() {
     checkAuth()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // 检查是否可以访问当前菜单（博客相关功能允许未登录访问）
+  const canAccessMenu = (menu) => {
+    if (menu === 'blog' || menu === 'blog-viewer') {
+      return true // 博客功能允许未登录访问
+    }
+    return isLoggedIn // 其他功能需要登录
+  }
 
   // 获取YouTube数据
   const { feeds: youtubeFeeds, loading: youtubeLoading, error: youtubeError, lastFetch, refresh } = useYoutubeRssFeed()
@@ -1643,8 +1667,9 @@ function App() {
     return null
   }
 
-  // 如果未登录，显示登录页面
-  if (!isLoggedIn) {
+  // 如果未登录且尝试访问需要登录的功能，显示登录页面
+  // 博客相关功能（blog 和 blog-viewer）允许未登录访问
+  if (!isLoggedIn && (activeMenu === 'login-required' || !canAccessMenu(activeMenu))) {
     return <Login onLoginSuccess={handleLoginSuccess} />
   }
 
@@ -1699,69 +1724,94 @@ function App() {
         <div className="sidebar-header">
           <h2>Eclair Collection</h2>
           <p>想想你为什么活着</p>
-          <button 
-            className="logout-btn"
-            onClick={handleLogout}
-            title="退出登录"
-          >
-            <FontAwesomeIcon icon={faSignOutAlt} />
-            退出登录
-          </button>
+          {isLoggedIn && (
+            <button 
+              className="logout-btn"
+              onClick={handleLogout}
+              title="退出登录"
+            >
+              <FontAwesomeIcon icon={faSignOutAlt} />
+              退出登录
+            </button>
+          )}
+          {!isLoggedIn && (
+            <button 
+              className="login-btn"
+              onClick={() => setActiveMenu('login-required')}
+              title="登录"
+            >
+              登录
+            </button>
+          )}
         </div>
         
-        <div className="search-bar">
-          <FontAwesomeIcon icon={faSearch} />
-          <input
-            type="text"
-            placeholder="搜索网站、博客、视频..."
-            value={searchTerm}
-            onChange={handleSearchChange}
-          />
-        </div>
-
-        {/* 主题切换按钮 */}
-        <div className="theme-toggle">
-          <div className="theme-toggle-label">主题模式</div>
-          <div className="theme-toggle-buttons">
-            {Object.entries(themes).map(([themeKey, theme]) => (
-              <button
-                key={themeKey}
-                className={`theme-toggle-btn ${currentTheme === themeKey ? 'active' : ''}`}
-                onClick={() => handleThemeChange(themeKey)}
-                title={theme.name}
-              >
-                <FontAwesomeIcon icon={theme.icon} />
-              </button>
-            ))}
+        {isLoggedIn && (
+          <div className="search-bar">
+            <FontAwesomeIcon icon={faSearch} />
+            <input
+              type="text"
+              placeholder="搜索网站、博客、视频..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
           </div>
-        </div>
+        )}
 
-        {/* 视图切换按钮 */}
-        <div className="view-toggle">
-          <div className="view-toggle-label">视图模式</div>
-          <div className="view-toggle-buttons">
-            <button
-              className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
-              onClick={() => setViewMode('grid')}
-              title="网格视图"
-            >
-              <FontAwesomeIcon icon={faGrip} />
-            </button>
-            <button
-              className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
-              onClick={() => setViewMode('list')}
-              title="列表视图"
-            >
-              <FontAwesomeIcon icon={faList} />
-            </button>
-          </div>
-        </div>
+        {isLoggedIn && (
+          <>
+            {/* 主题切换按钮 */}
+            <div className="theme-toggle">
+              <div className="theme-toggle-label">主题模式</div>
+              <div className="theme-toggle-buttons">
+                {Object.entries(themes).map(([themeKey, theme]) => (
+                  <button
+                    key={themeKey}
+                    className={`theme-toggle-btn ${currentTheme === themeKey ? 'active' : ''}`}
+                    onClick={() => handleThemeChange(themeKey)}
+                    title={theme.name}
+                  >
+                    <FontAwesomeIcon icon={theme.icon} />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 视图切换按钮 */}
+            <div className="view-toggle">
+              <div className="view-toggle-label">视图模式</div>
+              <div className="view-toggle-buttons">
+                <button
+                  className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                  onClick={() => setViewMode('grid')}
+                  title="网格视图"
+                >
+                  <FontAwesomeIcon icon={faGrip} />
+                </button>
+                <button
+                  className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+                  onClick={() => setViewMode('list')}
+                  title="列表视图"
+                >
+                  <FontAwesomeIcon icon={faList} />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
         
         {/* 特殊菜单区域 */}
         <div className="special-menus">
           <button
             className={`special-menu-btn youtube ${activeMenu === 'youtube' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('youtube')}
+            onClick={() => {
+              if (canAccessMenu('youtube')) {
+                setActiveMenu('youtube')
+              } else {
+                setActiveMenu('login-required')
+              }
+            }}
+            disabled={!isLoggedIn}
+            title={!isLoggedIn ? '需要登录' : ''}
           >
             <FontAwesomeIcon icon={faYoutube} />
             youtubo订阅
@@ -1769,7 +1819,15 @@ function App() {
           
           <button
             className={`special-menu-btn rss ${activeMenu === 'rss' ? 'active' : ''}`}
-            onClick={() => setActiveMenu('rss')}
+            onClick={() => {
+              if (canAccessMenu('rss')) {
+                setActiveMenu('rss')
+              } else {
+                setActiveMenu('login-required')
+              }
+            }}
+            disabled={!isLoggedIn}
+            title={!isLoggedIn ? '需要登录' : ''}
           >
             <FontAwesomeIcon icon={faRss} />
             RSS订阅
@@ -1784,43 +1842,45 @@ function App() {
           </button>
         </div>
         
-        <nav className="category-nav">
-          {Object.entries(categories).map(([category, { icon, subCategories }]) => (
-            <div key={category} className="category-group">
-              <div 
-                className="main-category"
-                data-expanded={expandedCategories.includes(category)}
-                onClick={() => toggleCategory(category)}
-              >
-                <FontAwesomeIcon icon={icon} />
-                <span>{category}</span>
-                <FontAwesomeIcon 
-                  icon={expandedCategories.includes(category) ? faChevronDown : faChevronRight} 
-                  className="expand-icon"
-                />
-              </div>
-              {expandedCategories.includes(category) && (
-                <div className="sub-categories">
-                  <button
-                    className={`sub-category ${activeMenu === 'main' && selectedMainCategory === category && selectedSubCategory === '全部' ? 'active' : ''}`}
-                    onClick={() => handleCategorySelect(category, '全部')}
-                  >
-                    全部
-                  </button>
-                  {subCategories.map(subCategory => (
-                    <button
-                      key={subCategory}
-                      className={`sub-category ${activeMenu === 'main' && selectedMainCategory === category && selectedSubCategory === subCategory ? 'active' : ''}`}
-                      onClick={() => handleCategorySelect(category, subCategory)}
-                    >
-                      {subCategory}
-                    </button>
-                  ))}
+        {isLoggedIn && (
+          <nav className="category-nav">
+            {Object.entries(categories).map(([category, { icon, subCategories }]) => (
+              <div key={category} className="category-group">
+                <div 
+                  className="main-category"
+                  data-expanded={expandedCategories.includes(category)}
+                  onClick={() => toggleCategory(category)}
+                >
+                  <FontAwesomeIcon icon={icon} />
+                  <span>{category}</span>
+                  <FontAwesomeIcon 
+                    icon={expandedCategories.includes(category) ? faChevronDown : faChevronRight} 
+                    className="expand-icon"
+                  />
                 </div>
-              )}
-            </div>
-          ))}
-        </nav>
+                {expandedCategories.includes(category) && (
+                  <div className="sub-categories">
+                    <button
+                      className={`sub-category ${activeMenu === 'main' && selectedMainCategory === category && selectedSubCategory === '全部' ? 'active' : ''}`}
+                      onClick={() => handleCategorySelect(category, '全部')}
+                    >
+                      全部
+                    </button>
+                    {subCategories.map(subCategory => (
+                      <button
+                        key={subCategory}
+                        className={`sub-category ${activeMenu === 'main' && selectedMainCategory === category && selectedSubCategory === subCategory ? 'active' : ''}`}
+                        onClick={() => handleCategorySelect(category, subCategory)}
+                      >
+                        {subCategory}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </nav>
+        )}
       </aside>
 
       <main className="main-content">
@@ -1918,7 +1978,7 @@ function App() {
               src={currentBlogUrl}
               className="blog-iframe"
               title="博客内容"
-              sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+              sandbox="allow-scripts allow-scripts allow-same-origin allow-popups allow-forms"
             />
           </div>
         )}

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>换电柜系统对接方案演示</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 FontAwesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- 基础动画 --- */
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 柜体样式 (CSS 绘图) --- */
+        .cabinet-body {
+            background-color: #374151; /* gray-700 */
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 4px;
+            gap: 4px;
+            border-bottom: 6px solid #1f2937; /* 底座 */
+        }
+        .cabinet-slot {
+            background-color: #4b5563; /* gray-600 */
+            border-radius: 2px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cabinet-slot::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: #10b981; /* 指示灯 green */
+            border-radius: 50%;
+            box-shadow: 0 0 5px #10b981;
+        }
+        .cabinet-screen {
+            position: absolute;
+            top: 20px;
+            right: -12px;
+            width: 40px;
+            height: 60px;
+            background-color: #3b82f6; /* default blue screen */
+            border: 2px solid #1f2937;
+            border-radius: 4px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            z-index: 10;
+        }
+        .cabinet-screen.customer-screen {
+            background-color: #10b981; /* Green for customer app */
+        }
+        
+        /* --- 连接线动画 --- */
+        .connection-line {
+            height: 4px;
+            background-image: linear-gradient(to right, #e5e7eb 50%, transparent 50%);
+            background-size: 20px 100%;
+            position: relative;
+        }
+        .connection-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            position: absolute;
+            top: -3px;
+            animation: moveRight 1.5s linear infinite;
+        }
+        @keyframes moveRight {
+            0% { left: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: 100%; opacity: 0; }
+        }
+
+        /* 垂直线动画 */
+        .connection-line-v {
+            width: 4px;
+            background-image: linear-gradient(to bottom, #e5e7eb 50%, transparent 50%);
+            background-size: 100% 20px;
+            position: relative;
+        }
+        .connection-dot-v {
+            width: 10px;
+            height: 10px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            position: absolute;
+            left: -3px;
+            animation: moveDown 1.5s linear infinite;
+        }
+        @keyframes moveDown {
+            0% { top: 0; opacity: 0; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .card-active {
+            border-color: #3B82F6; background-color: #EFF6FF;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+        }
+
+        /* 嵌入式芯片样式 */
+        .embedded-chip {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            border: 2px solid #93c5fd;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+            position: relative;
+        }
+        .embedded-chip::before { /* 金手指 */
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 10%; 
+            right: 10%;
+            height: 4px;
+            background-image: linear-gradient(to right, gold 50%, transparent 50%);
+            background-size: 8px 100%;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- 顶部 -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 text-white p-2 rounded-lg">
+                    <i class="fa-solid fa-charging-station text-xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900">智能换电柜 · 对接模式演示</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-bold text-gray-900">您希望如何接管这台柜子？</h2>
+            <!-- <p class="mt-2 text-gray-600">点击下方按钮，查看不同模式下软硬件如何配合</p> -->
+            <div class="mt-4 flex justify-center gap-6 text-sm">
+                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-blue-500 rounded-full"></span> <span>蓝色 = 我方提供 (标准件)</span></div>
+                <div class="flex items-center gap-2"><span class="w-3 h-3 bg-green-500 rounded-full"></span> <span>绿色 = 贵方开发 (自定义)</span></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- 左侧：选择器 -->
+            <div class="lg:col-span-4 flex flex-col gap-3">
+                <button onclick="selectMode(1)" id="btn-mode-1" class="mode-btn p-4 rounded-xl border-2 border-white bg-white hover:border-blue-200 shadow-sm text-left transition-all">
+                    <div class="font-bold text-lg mb-1">方式一：底层嵌入式开发</div>
+                    <div class="text-xs text-gray-500">云端到设备全链路客户自研</div>
+                </button>
+
+                <button onclick="selectMode(2)" id="btn-mode-2" class="mode-btn p-4 rounded-xl border-2 border-white bg-white hover:border-blue-200 shadow-sm text-left transition-all">
+                    <div class="font-bold text-lg mb-1">方式二：APP 通讯对接</div>
+                    <div class="text-xs text-gray-500">用我们的柜机 APP，连客户的云</div>
+                </button>
+
+                <button onclick="selectMode(3)" id="btn-mode-3" class="mode-btn p-4 rounded-xl border-2 border-white bg-white hover:border-blue-200 shadow-sm text-left transition-all">
+                    <div class="font-bold text-lg mb-1">方式三：云端 API 对接</div>
+                    <div class="text-xs text-gray-500">云对云，标准接口控制</div>
+                </button>
+
+                <button onclick="selectMode(4)" id="btn-mode-4" class="mode-btn p-4 rounded-xl border-2 border-white bg-white hover:border-blue-200 shadow-sm text-left transition-all">
+                    <div class="font-bold text-lg mb-1">方式四：SaaS 全套</div>
+                    <div class="text-xs text-gray-500">直接运营，无需开发</div>
+                </button>
+            </div>
+
+            <!-- 右侧：可视化演示 -->
+            <div class="lg:col-span-8 bg-white rounded-2xl shadow-lg border border-gray-100 p-6 relative min-h-[500px]">
+                <div id="diagram-container" class="h-full flex flex-col">
+                    <!-- JS 将渲染这里的内容 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部对比表 -->
+        <div class="mt-16 bg-white rounded-xl shadow overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h3 class="font-bold text-gray-800">一分钟决策指南</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left">
+                    <thead class="bg-gray-50 text-gray-500">
+                        <tr>
+                            <th class="px-6 py-3">模式</th>
+                            <th class="px-6 py-3">核心特点</th>
+                            <th class="px-6 py-3">谁来写代码？</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr>
+                            <td class="px-6 py-4 font-medium">方式一 (底层)</td>
+                            <td class="px-6 py-4">极度自由，但容易“踩坑”</td>
+                            <td class="px-6 py-4 text-green-600">贵方 (云 + APP + 协议)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-medium">方式二 (APP通讯)</td>
+                            <td class="px-6 py-4">稳定与灵活的平衡点</td>
+                            <td class="px-6 py-4 text-green-600">贵方 (云端 TCP/MQTT)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-medium">方式三 (云API)</td>
+                            <td class="px-6 py-4">最快的技术对接方式</td>
+                            <td class="px-6 py-4 text-green-600">贵方 (Web API调用)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 font-medium">方式四 (SaaS)</td>
+                            <td class="px-6 py-4">无需技术，商业变现</td>
+                            <td class="px-6 py-4 text-gray-400">无需代码</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- 柜体组件 HTML 生成器 ---
+        function getCabinetHTML(screenColorClass, appIcon, label) {
+            return `
+                <div class="relative flex flex-col items-center" style="width: 140px;">
+                    <!-- 柜子主体 -->
+                    <div class="cabinet-body w-32 h-48">
+                        <div class="cabinet-slot flex-1"></div>
+                        <div class="cabinet-slot flex-1"></div>
+                        <div class="cabinet-slot flex-1"></div>
+                        <div class="cabinet-slot flex-1"></div>
+                        <div class="cabinet-slot flex-1"></div>
+                        
+                        <!-- 屏幕 -->
+                        <div class="cabinet-screen ${screenColorClass} flex flex-col justify-center items-center text-white">
+                            <i class="${appIcon} text-2xl mb-1"></i>
+                            <span class="text-[8px] leading-tight text-center px-1 opacity-90">${label}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 云端组件 HTML 生成器 ---
+        function getCloudHTML(colorClass, title, icon = "fa-cloud") {
+            const bgClass = colorClass === 'blue' ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-green-50 border-green-200 text-green-700';
+            return `
+                <div class="flex flex-col items-center z-10">
+                    <div class="${bgClass} border-2 w-28 h-20 rounded-[50%] flex flex-col items-center justify-center shadow-sm relative bg-white">
+                        <i class="fa-solid ${icon} text-3xl mb-1"></i>
+                        <span class="text-xs font-bold">${title}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        const contentData = {
+            1: {
+                title: "方式一：底层硬件开发",
+                sub: "数据流：贵方云 -> 贵方 APP -> 硬件底层",
+                render: () => {
+                    return `
+                    <div class="flex flex-col items-center justify-center h-full fade-in pb-4">
+                        
+                        <!-- 布局容器：底部对齐，确保 APP 和 硬件 水平对齐 -->
+                        <div class="flex items-end gap-6 pt-4">
+                            
+                            <!-- 左侧列：贵方云端 + 贵方APP (垂直堆叠) -->
+                            <div class="flex flex-col items-center">
+                                <!-- Top: Customer Cloud -->
+                                <div class="mb-2">
+                                     ${getCloudHTML('green', '贵方云端', 'fa-server')}
+                                </div>
+
+                                <!-- Connection Down -->
+                                <div class="h-10 connection-line-v w-1 bg-gray-200 mb-2">
+                                     <div class="connection-dot-v"></div>
+                                </div>
+
+                                <!-- Customer APP (Running on Android Board) -->
+                                <div class="w-24 h-32 bg-green-500 rounded-lg border-4 border-gray-800 flex flex-col items-center justify-center text-white shadow-xl relative z-10">
+                                    <i class="fa-brands fa-android text-4xl mb-2"></i>
+                                    <div class="font-bold text-xs">贵方 APP</div>
+                                    <div class="absolute -top-2 -right-2 bg-yellow-400 text-yellow-900 text-[10px] px-2 py-0.5 rounded-full font-bold">主控</div>
+                                </div>
+                            </div>
+
+                            <!-- 中间列：水平连接线 -->
+                            <!-- padding-bottom 用于将线条抬升到 APP 和 芯片 的中间高度 -->
+                            <div class="flex flex-col items-center w-24 pb-14">
+                                <div class="text-[10px] text-gray-400 mb-1 bg-gray-100 px-2 rounded">CAN通讯</div>
+                                <div class="connection-line w-full bg-gray-300">
+                                    <div class="connection-dot bg-blue-600"></div>
+                                    <div class="connection-dot bg-green-600" style="animation-direction: reverse;"></div>
+                                </div>
+                                <i class="fa-solid fa-arrow-right-arrow-left text-gray-400 mt-1"></i>
+                            </div>
+
+                            <!-- 右侧列：我方嵌入式程序 -->
+                            <!-- padding-bottom 稍微调整以对齐左侧 APP 的视觉重心 -->
+                            <div class="flex flex-col items-center relative pb-2">
+                                <div class="embedded-chip w-24 h-24 rounded-lg flex flex-col items-center justify-center text-white z-10">
+                                    <i class="fa-solid fa-microchip text-3xl mb-1 text-blue-200"></i>
+                                    <div class="font-bold text-xs text-center px-1">我方<br>嵌入式程序</div>
+                                </div>
+                                <!-- Wire to hardware -->
+                                <div class="h-6 w-1 bg-gray-800 mt-[-2px]"></div>
+                                <div class="bg-gray-700 text-gray-300 text-[10px] px-2 py-1 rounded">驱动执行</div>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50 p-3 rounded-lg border border-blue-100 max-w-lg mt-8 text-sm text-blue-800">
+                            <span class="font-bold"><i class="fa-solid fa-circle-info mr-1"></i> 角色分工：</span>
+                            云端和APP业务全由您定。您只管根据协议对接我方硬件底层（can 协议）。
+                        </div>
+                    </div>`;
+                }
+            },
+            2: {
+                title: "方式二：柜机APP 通讯对接",
+                sub: "柜子还是我们的 APP，但它听您云端的指挥",
+                render: () => {
+                    return `
+                    <div class="flex flex-col items-center justify-center h-full fade-in relative">
+                        <!-- 布局：左云，右柜，中间连线 -->
+                        <div class="flex items-center justify-between w-full max-w-2xl px-8">
+                            
+                            <!-- Left: Customer Cloud -->
+                            ${getCloudHTML('green', '贵方云端', 'fa-server')}
+
+                            <!-- Connection -->
+                            <div class="flex-1 flex flex-col items-center px-4">
+                                <span class="text-xs font-mono text-blue-600 bg-blue-50 px-2 py-1 rounded mb-1">TCP / MQTT 协议</span>
+                                <div class="connection-line w-full bg-gray-200">
+                                    <div class="connection-dot"></div> <!-- Blue dot represents our protocol -->
+                                </div>
+                                <div class="flex justify-between w-full text-[10px] text-gray-400 mt-1">
+                                    <span>指令下发</span>
+                                    <span>状态上报</span>
+                                </div>
+                            </div>
+
+                            <!-- Right: Cabinet with Blue Screen -->
+                            ${getCabinetHTML('bg-blue-600', 'fa-solid fa-bolt', '我方 APP')}
+                        </div>
+
+                        <div class="mt-8 bg-blue-50 p-4 rounded-lg text-sm text-blue-800 max-w-lg">
+                            <p class="font-bold mb-1"><i class="fa-solid fa-thumbs-up mr-1"></i> 优势：</p>
+                            柜机上的复杂硬件逻辑（如电池识别、换电逻辑，充电逻辑等等）由我方 APP 处理好，贵方只需在云端发送简单的“换电”、“开门”等等指令即可。
+                        </div>
+                    </div>`;
+                }
+            },
+            3: {
+                title: "方式三：云端 API 对接",
+                sub: "云对云握手，最标准的现代互联网对接",
+                render: () => {
+                    return `
+                    <div class="flex flex-col items-center justify-center h-full fade-in">
+                        
+                        <!-- Top Layer: Cloud to Cloud -->
+                        <div class="flex items-center gap-12 mb-8">
+                            <!-- Customer Cloud -->
+                            ${getCloudHTML('green', '贵方云端', 'fa-server')}
+                            
+                            <!-- API Connection -->
+                            <div class="flex flex-col items-center w-32">
+                                <span class="text-xs font-bold text-gray-500 mb-1">HTTPS API</span>
+                                <div class="connection-line w-full">
+                                    <div class="connection-dot"></div>
+                                </div>
+                                <i class="fa-solid fa-arrow-right-arrow-left text-gray-300 mt-1"></i>
+                            </div>
+
+                            <!-- Our Cloud -->
+                            ${getCloudHTML('blue', '我方云端')}
+                        </div>
+
+                        <!-- Vertical Connection to Cabinet -->
+                        <div class="flex flex-col items-center relative" style="margin-left: 240px;"> <!-- Align with Our Cloud roughly -->
+                            <div class="h-16 connection-line-v w-1 bg-gray-200">
+                                <div class="connection-dot-v"></div>
+                            </div>
+                            
+                            <!-- Cabinet -->
+                            <div class="mt-2">
+                                ${getCabinetHTML('bg-blue-600', 'fa-solid fa-bolt', '我方 APP')}
+                            </div>
+                        </div>
+
+                        <div class="absolute bottom-4 left-4 text-xs text-gray-400">
+                            <p>路径：用户 -> 贵方云 -> 我方云 -> 柜子</p>
+                        </div>
+                    </div>`;
+                }
+            },
+            4: {
+                title: "方式四：SaaS 整套系统",
+                sub: "从用户到硬件，全链路数据流演示",
+                render: () => {
+                    return `
+                    <div class="flex flex-col items-center justify-center h-full fade-in gap-2">
+                        
+                        <!-- Top: User -->
+                        <div class="flex flex-col items-center z-20">
+                             <div class="relative">
+                                <i class="fa-solid fa-mobile-screen-button text-4xl text-gray-700"></i>
+                                <div class="absolute inset-0 flex items-center justify-center pt-1">
+                                    <i class="fa-solid fa-bolt text-blue-500 text-sm"></i>
+                                </div>
+                            </div>
+                            <span class="text-sm font-bold mt-1">最终用户</span>
+                        </div>
+
+                        <!-- Arrow Down (Animated) -->
+                        <div class="h-14 connection-line-v w-1 bg-gray-200">
+                             <div class="connection-dot-v bg-blue-500"></div>
+                        </div>
+
+                        <!-- Middle: Our Cloud -->
+                         ${getCloudHTML('blue', '我方云端平台')}
+
+                        <!-- Arrow Down (Animated) -->
+                        <div class="h-14 connection-line-v w-1 bg-gray-200">
+                             <div class="connection-dot-v bg-blue-500"></div>
+                        </div>
+
+                        <!-- Bottom: Cabinet -->
+                        <div class="flex items-start gap-4">
+                             ${getCabinetHTML('bg-blue-600', 'fa-solid fa-bolt', '标准系统')}
+                             
+                             <!-- Legend for Hardware Layer -->
+                             <div class="mt-8 bg-gray-100 p-2 rounded text-xs text-gray-500">
+                                <div class="flex items-center gap-2"><i class="fa-solid fa-arrow-down text-blue-500"></i> 4G/Wifi 指令</div>
+                                <div class="flex items-center gap-2 mt-1"><i class="fa-solid fa-microchip text-gray-700"></i> 硬件自动执行</div>
+                             </div>
+                        </div>
+
+                    </div>`;
+                }
+            }
+        };
+
+        function selectMode(modeIndex) {
+            // Update Buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('card-active', 'ring-2', 'ring-blue-500');
+            });
+            const activeBtn = document.getElementById(`btn-mode-${modeIndex}`);
+            activeBtn.classList.add('card-active', 'ring-2', 'ring-blue-500');
+
+            // Render Content
+            const container = document.getElementById('diagram-container');
+            const data = contentData[modeIndex];
+            
+            // Re-render
+            container.innerHTML = `
+                <div class="mb-6 border-b border-gray-100 pb-4">
+                    <h2 class="text-2xl font-bold text-gray-900">${data.title}</h2>
+                    <p class="text-lg text-blue-600 mt-1">${data.sub}</p>
+                </div>
+                <div class="flex-1 relative">
+                    ${data.render()}
+                </div>
+            `;
+        }
+
+        // Init
+        window.onload = () => selectMode(1);
+
+    </script>
+</body>
+</html>
