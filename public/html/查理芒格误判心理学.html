@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>查理·芒格：人类误判心理学指南</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #c0392b;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+        }
+
+        body.dark-mode {
+            --primary-color: #ecf0f1;
+            --accent-color: #5dade2;
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-color: #f0f0f0;
+            --text-secondary: #aaaaaa;
+            --border-color: #444;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        * { box-sizing: border-box; transition: background-color 0.3s, color 0.3s; }
+        
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--card-bg);
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 { margin: 0; font-size: 1.8rem; color: var(--primary-color); }
+        p.subtitle { color: var(--text-secondary); margin-top: 0.5rem; font-size: 0.9rem; }
+
+        /* Controls */
+        .controls {
+            max-width: 800px;
+            margin: 1.5rem auto 0;
+            display: flex;
+            gap: 1rem;
+            padding: 0 1rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 30px;
+            font-size: 1rem;
+            outline: none;
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        input[type="text"]:focus { border-color: var(--accent-color); }
+
+        button {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            background-color: var(--primary-color);
+            color: var(--bg-color);
+        }
+
+        button.outline {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Grid */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.02);
+        }
+
+        .card-header:hover { background: rgba(0,0,0,0.04); }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-number {
+            background: var(--accent-color);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .icon-arrow {
+            transition: transform 0.3s;
+        }
+        
+        .card.active .icon-arrow { transform: rotate(180deg); }
+
+        .card-body {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+        }
+
+        .card.active .card-body {
+            padding: 1.5rem;
+            max-height: 2000px; /* Arbitrary large number for animation */
+        }
+
+        /* Content Styles within Card */
+        .section-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .tag-core { background: #e8f6f3; color: #1abc9c; }
+        .tag-example { background: #ebf5fb; color: #3498db; }
+        .tag-inversion { background: #fdedec; color: #e74c3c; }
+        .tag-advice { background: #fef9e7; color: #f1c40f; }
+
+        body.dark-mode .tag-core { background: #145a32; color: #a2d9ce; }
+        body.dark-mode .tag-example { background: #154360; color: #a9cce3; }
+        body.dark-mode .tag-inversion { background: #641e16; color: #f5b7b1; }
+        body.dark-mode .tag-advice { background: #7d6608; color: #f9e79f; }
+
+        h3 { margin-top: 0; font-size: 1.1rem; }
+        ul { padding-left: 1.2rem; }
+        li { margin-bottom: 0.5rem; }
+
+        .highlight-box {
+            background: rgba(52, 152, 219, 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 1rem;
+            border-radius: 4px;
+            margin: 1rem 0;
+        }
+
+        .conclusion-card {
+            border: 2px solid var(--accent-color);
+            background: linear-gradient(135deg, var(--card-bg) 0%, rgba(52, 152, 219, 0.05) 100%);
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            .controls { flex-direction: column; }
+            button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>查理·芒格：人类误判心理学</h1>
+    <p class="subtitle">The Psychology of Human Misjudgment - 智慧思维模型库</p>
+    <div class="controls">
+        <input type="text" id="searchInput" placeholder="搜索倾向、案例或关键词 (如: 联邦快递, 妒忌)...">
+        <button onclick="toggleAll(true)">全部展开</button>
+        <button onclick="toggleAll(false)" class="outline">全部收起</button>
+        <button onclick="toggleTheme()" id="themeBtn">🌙</button>
+    </div>
+</header>
+
+<div class="container" id="cardContainer">
+    <!-- JS will inject cards here -->
+</div>
+
+<footer>
+    <p>基于查理·芒格著名演讲整理 | 逆向思考 · 金字塔原理 · Lollapalooza效应</p>
+</footer>
+
+<script>
+    // Data Source
+    const tendencies = [
+        {
+            id: 1,
+            title: "奖励和惩罚超级反应倾向",
+            eng: "Reward and Punishment Superresponse Tendency",
+            core: "激励机制决定一切。人不仅仅会被激励驱动，甚至会因为激励机制而潜意识地扭曲认知。",
+            detail: "富兰克林说：'如果你想要说服别人，要诉诸利益，而非诉诸理性。' 这种倾向能让好人做坏事，并真心相信自己在做正确的事。",
+            examples: [
+                "<b>联邦快递(FedEx)</b>：按小时计薪导致工人磨洋工，改为按班次计薪（干完回家）后效率瞬间提升。",
+                "<b>理财顾问</b>：如果顾问靠佣金生活，他几乎一定会建议你多买保险/股票。",
+                "<b>富国银行</b>：为了完成开户指标，员工开设数百万虚假账户。"
+            ],
+            inversion: "如果你想搞砸一家公司，就制定一套奖励'你不想看到的行为'的机制（例如：按代码行数给程序员发奖金）。",
+            advice: "1. 永远先看激励机制(KPI)。<br>2. 警惕那些给你提建议但又能从建议中获利的人。"
+        },
+        {
+            id: 2,
+            title: "喜欢/热爱倾向",
+            eng: "Liking/Loving Tendency",
+            core: "为了保持心理舒适，我们会下意识忽略喜欢对象的缺点，并爱屋及乌。",
+            detail: "这是一种进化机制（婴儿必须爱父母）。危险在于它会导致'现实扭曲'，让你看不到风险。",
+            examples: [
+                "<b>慈母多败儿</b>：母亲无法客观看到孩子的罪行。",
+                "<b>品牌忠诚</b>：果粉会为苹果产品的明显缺陷辩护。",
+                "<b>光环效应</b>：因为一个人长得好看，就觉得他也很聪明善良。"
+            ],
+            inversion: "一旦我产生了一个想法，我就把它当成我的孩子，誓死捍卫它，拒绝听取反对意见。",
+            advice: "别爱上你的投资品（股票），它们不爱你。"
+        },
+        {
+            id: 3,
+            title: "讨厌/憎恨倾向",
+            eng: "Disliking/Hating Tendency",
+            core: "忽略讨厌对象的优点，并扭曲事实来将仇恨合理化。",
+            detail: "这是喜欢倾向的镜像。它不仅针对人，还针对思想、政党。",
+            examples: [
+                "<b>离婚大战</b>：双方把对方妖魔化，看不到任何一点好。",
+                "<b>波斯信使综合症</b>：杀掉带来坏消息的人，因为讨厌坏消息进而讨厌信使。",
+                "<b>政治极化</b>：反对敌对政党提出的所有政策，哪怕是对自己有利的。"
+            ],
+            inversion: "一旦确定谁是敌人，就认定他们一无是处，不去学习他们的长处。",
+            advice: "客观清单：强迫自己写下'我不喜欢的人的3个优点'。"
+        },
+        {
+            id: 4,
+            title: "避免怀疑倾向",
+            eng: "Doubt-Avoidance Tendency",
+            core: "大脑为了减压，会跳过理性分析，直接下结论。",
+            detail: "人类大脑不是为了求真，而是为了求存。在困惑和压力下，为了消除'怀疑'带来的焦虑，大脑会迅速做出决定（通常是跑或战斗）。",
+            examples: [
+                "<b>宗教与邪教</b>：迷茫压力大时，人容易皈依提供'绝对真理'的组织。",
+                "<b>销售逼单</b>：'最后十分钟优惠'制造压力，迫使你消除怀疑立刻下单。"
+            ],
+            inversion: "一定要在自己压力最大、身心疲惫且信息匮乏的时候做重大决定。",
+            advice: "在压力大时，强迫自己延迟决策。使用检查清单(Checklist)。"
+        },
+        {
+            id: 5,
+            title: "避免不一致倾向",
+            eng: "Inconsistency-Avoidance Tendency",
+            core: "大脑抗拒改变。一旦做出决定或形成习惯，就会死守。",
+            detail: "为了节省运算能量和维持社会信任。这导致了'确认偏误'——只看支持自己的信息。",
+            examples: [
+                "<b>普朗克定理</b>：科学进步靠老一代科学家死光。",
+                "<b>富兰克林效应</b>：让不喜欢你的人帮你个小忙，他会为了维持内心一致性而变得喜欢你。",
+                "<b>沉没成本</b>：为了证明之前的决策没错，追加投资于亏损项目。"
+            ],
+            inversion: "尽早下结论，并公开表态，锁死自己的退路。",
+            advice: "推迟判断。如果你不能比你最聪明的对手更好地反驳你自己的观点，你就没有资格拥有这个观点。"
+        },
+        {
+            id: 6,
+            title: "好奇心倾向",
+            eng: "Curiosity Tendency",
+            core: "对抗僵化思维和愚蠢决策的解毒剂。",
+            detail: "人类特有的、在无直接奖励下探索'为什么'的冲动。现代文明的引擎。",
+            examples: [
+                "<b>侦探思维</b>：管理者不责骂，而是问'为什么销售额下降'。",
+                "<b>跨学科学习</b>：芒格的格栅思维模型。",
+                "<b>雅典的衰落</b>：缺乏对机械和实验的好奇心。"
+            ],
+            inversion: "停止问'为什么'。只关注怎么应付眼前任务，不深究原理。",
+            advice: "保持像儿童一样的好奇心。在愤怒时问自己：'为什么我会这样？'"
+        },
+        {
+            id: 7,
+            title: "康德式公平倾向",
+            eng: "Kantian Fairness Tendency",
+            core: "要求每个人都遵守同一套行为准则，否则会引发巨大的愤怒。",
+            detail: "基于'绝对命令'。一旦有人破坏规则（插队），即使损失微小，人们也会暴怒。",
+            examples: [
+                "<b>排队的愤怒</b>：插队破坏了系统公平。",
+                "<b>最后通牒博弈</b>：宁愿自己一分钱不要，也要惩罚给钱太少（不公平）的人。",
+                "<b>薪酬保密</b>：避免员工因横向比较觉得不公而消极怠工。"
+            ],
+            inversion: "作为老板，制定双重标准，对自己宽容，对员工严苛。",
+            advice: "设计制度时确保规则对所有人适用，没有特权阶级。"
+        },
+        {
+            id: 8,
+            title: "艳羡/妒忌倾向",
+            eng: "Envy/Jealousy Tendency",
+            core: "基于比较的快乐杀手。'别人有，我没有，我痛苦。'",
+            detail: "芒格认为这是最愚蠢的倾向，因为它没有任何乐趣。驱动世界的不是贪婪，是妒忌。",
+            examples: [
+                "<b>该隐与亚伯</b>：因为上帝接受了弟弟的祭品而杀人。",
+                "<b>股市泡沫</b>：看到隔壁笨蛋买了投机股发财，理智的人也会发疯进场。",
+                "<b>高管薪酬</b>：CEO只在乎不能比隔壁CEO拿得少。"
+            ],
+            inversion: "时刻关注比你过得好的人，建立错误的因果联系（他成功纯靠运气）。",
+            advice: "这笔买卖不划算（只有痛苦）。快乐取决于心态，而非比较。"
+        },
+        {
+            id: 9,
+            title: "回馈倾向",
+            eng: "Reciprocation Tendency",
+            core: "人类有'以德报德，以牙还牙'的本能，也包括对'让步'的回馈。",
+            detail: "社会协作的基础，也是销售员最爱的工具（拒绝-后撤术）。",
+            examples: [
+                "<b>水门事件</b>：为了回馈提议者从100万降到25万预算的'让步'，批准了愚蠢的计划。",
+                "<b>免费试吃</b>：拿人手短，吃人嘴软。",
+                "<b>拒绝-后撤</b>：先提大要求被拒，再提小要求（让步），对方答应概率大增。"
+            ],
+            inversion: "在谈判中对别人的虚假让步感激涕零，立刻签约。",
+            advice: "区分意图：如果恩惠是销售策略，就在心理上免除回馈义务。"
+        },
+        {
+            id: 10,
+            title: "受简单联想影响倾向",
+            eng: "Influence-from-Mere-Association Tendency",
+            core: "只要两件事经常在一起，大脑就会把它们等同起来。",
+            detail: "大脑的快捷方式，不进行复杂因果分析。广告的核心原理。",
+            examples: [
+                "<b>价格=质量</b>：高价自动联想到好货。",
+                "<b>波斯信使</b>：坏消息=信使，所以杀掉信使。",
+                "<b>拿旧地图找新大陆</b>：因为不写文档在初创期成功了，所以现在不写文档也能成功。"
+            ],
+            inversion: "因为某人穿拖鞋面试（外表联想），就认定他技术不行。",
+            advice: "把产品的'包装'、'价格'和'代言人'去掉，只看产品本身。"
+        },
+        {
+            id: 11,
+            title: "简单的、避免痛苦的心理否认",
+            eng: "Simple, Pain-Avoiding Psychological Denial",
+            core: "如果事实太痛苦，大脑会扭曲现实，假装它不存在。",
+            detail: "一种悲剧性的自我保护机制。在毒品、爱情、破产中常见。",
+            examples: [
+                "<b>丧子之痛</b>：母亲拒绝相信优秀的儿子死了，几十年如一日留着他的位置。",
+                "<b>皇帝新衣</b>：交易员在亏损时真心相信'只是波动'，错过止损。",
+                "<b>项目延期</b>：经理坚信能按时上线，哪怕没有任何客观依据。"
+            ],
+            inversion: "面对坏消息大发雷霆，构建只有好消息的回声室。",
+            advice: "如果你觉得现实太痛苦，那就去处理它，而不是否认它。"
+        },
+        {
+            id: 12,
+            title: "自视过高的倾向",
+            eng: "Excessive Self-Regard Tendency",
+            core: "高估自己，高估自己的财产，高估自己的决定。",
+            detail: "禀赋效应：一旦拥有，价值倍增。沃比根湖效应：90%司机觉得车技高于平均。",
+            examples: [
+                "<b>彩票实验</b>：对自己挑的号码估值远高于随机分配的号码。",
+                "<b>我的孩子</b>：'哪怕是坏孩子，那是我的坏孩子。'",
+                "<b>愚蠢收购</b>：CEO坚信自己能经营好别人经营不好的烂公司。"
+            ],
+            inversion: "只雇佣和自己长得像、想得像的马屁精。",
+            advice: "评价自己的东西时，强迫自己减去50%的分数。"
+        },
+        {
+            id: 13,
+            title: "过度乐观倾向",
+            eng: "Overoptimism Tendency",
+            core: "一个人想要什么，他就会相信什么。",
+            detail: "欲望通过潜意识修改了对概率的认知。进化的止痛药。",
+            examples: [
+                "<b>买彩票</b>：忽略数学概率，被'中奖后'的画面感填满。",
+                "<b>规划谬误</b>：做软件项目计划时，总是基于'一切顺利'的最佳假设。",
+                "<b>市场泡沫</b>：'这次不一样'。"
+            ],
+            inversion: "做预算时不留缓冲，假设所有环节都完美运行。",
+            advice: "学习概率论。使用'事前验尸'法：假设项目已失败，倒推原因。"
+        },
+        {
+            id: 14,
+            title: "被剥夺的超级反应倾向",
+            eng: "Deprival-Superreaction Tendency",
+            core: "损失带来的痛苦是获得快乐的2倍。无法接受'差点就赢了'。",
+            detail: "能量巨大的倾向。不仅针对已有的，还针对'即将到手'的。",
+            examples: [
+                "<b>赌徒破产</b>：输钱后急于回本，把剩余资产看作'翻本工具'而非资产。",
+                "<b>新可乐灾难</b>：消费者愤怒是因为公司剥夺了'旧味道'。",
+                "<b>不要动奶酪</b>：给员工发奖金容易，扣回奖金会引发仇恨。"
+            ],
+            inversion: "在拍卖会上陷入公开竞拍，觉得东西已经是自己的了，拼命加价。",
+            advice: "零基思维：如果我现在没持有这个亏损股，我会买它吗？如果不，卖掉。"
+        },
+        {
+            id: 15,
+            title: "社会认同倾向",
+            eng: "Social-Proof Tendency",
+            core: "在困惑或压力下，随大流。'大家都在做，所以是对的。'",
+            detail: "自动导航机制。会导致群体性疯狂。",
+            examples: [
+                "<b>旁观者效应</b>：没人报警，因为看别人也没报警。",
+                "<b>谢皮科效应</b>：清白警察在腐败群体中被视为异类。",
+                "<b>旅鼠行为</b>：盲目收购化肥厂，因为竞争对手都在买。"
+            ],
+            inversion: "雇佣托儿排队，伪造好评，制造虚假共识。",
+            advice: "学会忽视大众。反其道而行（别人贪婪我恐惧）。"
+        },
+        {
+            id: 16,
+            title: "对比错误的反应倾向",
+            eng: "Contrast-Misreaction Tendency",
+            core: "没有绝对值，只有相对值。微小的变化会被忽视（温水煮青蛙）。",
+            detail: "利用反差（高价锚点）可以操控判断。",
+            examples: [
+                "<b>三桶水实验</b>：参照系决定感觉。",
+                "<b>房产托儿</b>：先看烂房子，再看普通房子觉得像珍宝。",
+                "<b>温水煮青蛙</b>：道德沦丧往往是从微小的让步开始的。"
+            ],
+            inversion: "先提离谱要求制造反差，再提想达成的要求。",
+            advice: "独立评估价值，忽略参照物。警惕微小的坏习惯。"
+        },
+        {
+            id: 17,
+            title: "压力影响倾向",
+            eng: "Stress-Influence Tendency",
+            core: "压力是理性的粉碎机。极端压力可重塑性格。",
+            detail: "巴甫洛夫发现压力能洗掉条件反射。",
+            examples: [
+                "<b>列宁格勒大洪水</b>：被淹的狗性格大变，忘了所有指令。",
+                "<b>审讯与洗脑</b>：为了解除当下压力的痛苦，承认没做过的罪行。",
+                "<b>基金经理崩溃</b>：在市场崩盘压力下恐慌抛售。"
+            ],
+            inversion: "给对手制造不确定性和极度紧迫感，剥夺睡眠。",
+            advice: "压力大时智商为0，不要做决策。依靠检查清单。"
+        },
+        {
+            id: 18,
+            title: "错误衡量易得性倾向",
+            eng: "Availability-Misweighing Tendency",
+            core: "因为容易记起，所以觉得重要。大脑偏爱鲜活的信息。",
+            detail: "搜索引擎偏见：按'加载速度'而非'相关性'排序。",
+            examples: [
+                "<b>飞机vs汽车</b>：空难画面鲜活，让人觉得比车祸更危险。",
+                "<b>路灯下找钥匙</b>：使用容易获得的数据，而不是重要的数据。",
+                "<b>广告轰炸</b>：占据大脑易得性，让你口渴时只想到它。"
+            ],
+            inversion: "只看头条新闻做决策，用个例反驳大数据（'我有个朋友...'）。",
+            advice: "别看个例，看基准概率（统计数据）。逆向寻找反面证据。"
+        },
+        {
+            id: 19,
+            title: "不用就忘倾向",
+            eng: "Use-It-or-Lose-It Tendency",
+            core: "所有技能都会衰退。高阶技能（数学、外语）忘得最快。",
+            detail: "神经剪枝：用进废退。但练到滚瓜烂熟的技能捡起来快。",
+            examples: [
+                "<b>帕德雷夫斯基定律</b>：一天不练琴，自己知道；三天不练，观众知道。",
+                "<b>飞行员模拟器</b>：强制激活平时不用的应对引擎熄火的神经回路。",
+                "<b>考证党</b>：考完试不工作，两年后知识归零。"
+            ],
+            inversion: "考完试立刻扔书。工作中只做简单重复的事。",
+            advice: "使用检查清单。对关键技能进行刻意练习。"
+        },
+        {
+            id: 20,
+            title: "权威-错误影响倾向",
+            eng: "Authority-Misinfluence Tendency",
+            core: "盲目服从权威（或看起来像权威的人），关闭批判性思维。",
+            detail: "进化捷径。符号（制服、头衔）能骗过大脑。",
+            examples: [
+                "<b>米尔格拉姆实验</b>：65%普通人因为穿白大褂的人命令，对他人施加致命电击。",
+                "<b>机长综合症</b>：副机长不敢指出机长的明显错误，导致坠机。",
+                "<b>屁股痛笑话</b>：护士盲从医生荒谬的'Rear'指令。"
+            ],
+            inversion: "给自己安一堆头衔，穿昂贵西装，自信地胡说八道。",
+            advice: "核查而非服从。相信上帝，但别忘了锁门。"
+        },
+        {
+            id: 21,
+            title: "废话倾向",
+            eng: "Twaddle Tendency",
+            core: "人有'瞎得瑟'和'讲废话'的冲动，严重干扰实干者。",
+            detail: "蜜蜂乱舞：面对无法处理的信息，选择胡乱跳舞。",
+            examples: [
+                "<b>会议灾难</b>：把开会本身当成工作成果，讲30分钟没重点。",
+                "<b>学术行政</b>：冗长的备忘录干扰教授做研究。"
+            ],
+            inversion: "奖励PPT写得漂亮但无产出的人。按时长开会。",
+            advice: "让说废话的人彼此去说，把他们和做实事的人物理隔离。"
+        },
+        {
+            id: 22,
+            title: "重视理由倾向",
+            eng: "Reason-Respecting Tendency",
+            core: "人天生寻找因果。只要给个理由（哪怕是废话），配合度也会大增。",
+            detail: "兰格复印机实验：'因为我想复印'也能说服人插队。",
+            examples: [
+                "<b>卡尔·布劳恩铁律</b>：布置任务必须讲清楚Why，否则解雇。",
+                "<b>伪科学广告</b>：'因为它含有X因子'。",
+                "<b>股市解说</b>：媒体必须为随机波动编造一个理由。"
+            ],
+            inversion: "独裁管理：'照做，别问为什么'。",
+            advice: "永远不要吝啬解释'Why'。深度学习要懂原理。"
+        }
+    ];
+
+    // Lollapalooza Special Object
+    const lollapalooza = {
+        title: "Lollapalooza效应",
+        eng: "Lollapalooza Effect",
+        core: "终极形态：多种心理倾向共同作用于同一个方向，产生指数级、核爆炸般的极端结果。",
+        detail: "芒格自创词汇。现实世界中的大灾难或大成功，往往不是单一倾向造成的，而是权威+压力+社会认同+被剥夺反应等叠加的结果。",
+        examples: [
+            "<b>纳粹德国</b>：权威(希特勒) + 废话(宣传) + 压力(盖世太保) + 社会认同(狂热集会) + 被剥夺反应(一战耻辱)。",
+            "<b>邪教洗脑</b>：权威(教主) + 压力(隔离/饥饿) + 社会认同(信徒) + 一致性(承诺)。",
+            "<b>AA互助会</b>：利用多种倾向的正向叠加来戒酒。"
+        ],
+        advice: "这是芒格思维模型的最高潮。当你分析复杂事件时，寻找那些叠加的因素。"
+    };
+
+    const container = document.getElementById('cardContainer');
+    const searchInput = document.getElementById('searchInput');
+
+    // Render Cards
+    function render(filterText = '') {
+        container.innerHTML = '';
+        
+        const filtered = tendencies.filter(t => 
+            t.title.includes(filterText) || 
+            t.core.includes(filterText) || 
+            t.examples.some(e => e.includes(filterText))
+        );
+
+        // Render standard tendencies
+        filtered.forEach(t => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="card-header" onclick="toggleCard(this)">
+                    <div class="card-title">
+                        <span class="card-number">${t.id}</span>
+                        ${t.title}
+                    </div>
+                    <span class="icon-arrow">▼</span>
+                </div>
+                <div class="card-body">
+                    <p style="color:var(--text-secondary); font-size:0.9rem; margin-top:0;">${t.eng}</p>
+                    
+                    <div class="section-tag tag-core">核心机制</div>
+                    <div class="highlight-box"><strong>${t.core}</strong></div>
+                    <p>${t.detail}</p>
+
+                    <div class="section-tag tag-example">经典案例</div>
+                    <ul>
+                        ${t.examples.map(ex => `<li>${ex}</li>`).join('')}
+                    </ul>
+
+                    <div class="section-tag tag-inversion">逆向思考</div>
+                    <div style="background: rgba(231, 76, 60, 0.1); padding: 10px; border-radius: 4px; color: var(--text-color);">
+                        ${t.inversion}
+                    </div>
+
+                    <div class="section-tag tag-advice">芒格建议</div>
+                    <p>${t.advice}</p>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        // Always show Lollapalooza at the end if no filter or if it matches
+        if (filterText === '' || lollapalooza.title.includes(filterText) || lollapalooza.core.includes(filterText)) {
+            const lollaCard = document.createElement('div');
+            lollaCard.className = 'card conclusion-card';
+            lollaCard.innerHTML = `
+                <div class="card-header" onclick="toggleCard(this)">
+                    <div class="card-title" style="color:var(--danger-color);">
+                        <span class="card-number" style="background:var(--danger-color);">∞</span>
+                        ${lollapalooza.title}
+                    </div>
+                    <span class="icon-arrow">▼</span>
+                </div>
+                <div class="card-body">
+                    <p style="color:var(--text-secondary); font-size:0.9rem;">${lollapalooza.eng}</p>
+                    <h3 style="color:var(--danger-color); margin-top:1rem;">${lollapalooza.core}</h3>
+                    <p>${lollapalooza.detail}</p>
+                    <div class="section-tag tag-example">叠加效应案例</div>
+                    <ul>
+                        ${lollapalooza.examples.map(ex => `<li>${ex}</li>`).join('')}
+                    </ul>
+                    <div class="section-tag tag-advice">终极建议</div>
+                    <p><strong>${lollapalooza.advice}</strong></p>
+                </div>
+            `;
+            container.appendChild(lollaCard);
+        }
+    }
+
+    // Interaction Functions
+    function toggleCard(header) {
+        const card = header.parentElement;
+        card.classList.toggle('active');
+    }
+
+    function toggleAll(expand) {
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            if (expand) card.classList.add('active');
+            else card.classList.remove('active');
+        });
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        const btn = document.getElementById('themeBtn');
+        btn.innerText = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+    }
+
+    // Search Listener
+    searchInput.addEventListener('input', (e) => {
+        render(e.target.value);
+    });
+
+    // Initial Render
+    render();
+
+</script>
+
+</body>
+</html>
