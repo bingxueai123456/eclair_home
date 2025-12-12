@@ -920,6 +920,14 @@ const initialLinks = [
     subCategory: 'AI',
     description: 'codewiki.google，一个谷歌的代码wiki，可以查看各种代码的实现原理',
     rating: 7,
+  },{
+    id:110,
+    title: 'claude code template',
+    url: 'https://www.aitmpl.com/agents',
+    mainCategory: '研发',
+    subCategory: 'AI',
+    description: 'claude code template，一个claude的提示 agent',
+    rating: 7,
   }
 
   
