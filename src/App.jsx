@@ -928,6 +928,14 @@ const initialLinks = [
     subCategory: 'AI',
     description: 'claude code template，一个claude的提示 agent',
     rating: 7,
+  },{
+    id:111,
+    title: 'vibe code教程',
+    url: 'https://www.vibevibe.cn/Basic',
+    mainCategory: '研发',
+    subCategory: 'AI',
+    description: 'vibevibe code教程，一个vibe code的教程',
+    rating: 7,
   }
 
   
