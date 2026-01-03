@@ -88,9 +88,10 @@
 .admin-tabs {
   display: flex;
   gap: 4px;
-  padding: 16px 24px;
+  padding: 16px 24px 20px 24px; /* 增加底部padding */
   border-bottom: 1px solid var(--galaxy-border);
   overflow-x: auto;
+  flex-shrink: 0; /* 防止被压缩 */
 }
 
 .tab-btn {
@@ -127,7 +128,8 @@
 .admin-content {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
+  padding: 28px 24px 24px 24px; /* 增加顶部间距到28px */
+  min-height: 0; /* 确保flex子元素正确滚动 */
 }
 
 /* 管理器区块 */
@@ -135,6 +137,10 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.manager-section:first-child {
+  margin-top: 0; /* 第一个区块不需要额外上边距 */
 }
 
 .manager-header {
