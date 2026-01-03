@@ -13,1121 +13,32 @@ import {
   faSpinner,
   faRss,
   faSignOutAlt,
-  faUser
+  faUser,
+  faFolder,
+  faGlobe
 } from '@fortawesome/free-solid-svg-icons'
 
 import { faGithub, faYoutube } from '@fortawesome/free-brands-svg-icons'
-import './App.css'
+import './styles/galaxy-theme.css'
+import './styles/galaxy-components.css'
 import useYoutubeRssFeed from './useYoutubeRssFeed'
 import useRssManager from './useRssManager'
-import { useGlobalSearch, SearchResults } from './useGlobalSearch'
-import Login from './Login'
+import { useGlobalSearch, SearchResults, SEARCH_TYPES } from './useGlobalSearch'
+import { useAuth } from './hooks/useAuth.jsx'
+import { useWebsites, useCategories, useHtmlPages } from './hooks/useDatabase.jsx'
+import { Login, AdminPanel } from './components'
 
-const initialLinks = [
-  {
-    id: 1,
-    title: 'vercel',
-    url: 'https://vercel.com/eclairs-projects-e8134ecf',
-    mainCategory: '研发',
-    subCategory: '开发工具',
-    description: 'Vercel 是一个云平台,用于构建、部署和扩展无服务器应用程序和静态网站',
-    rating: 7,
-    icon: faGear
-  },
-  {
-    id: 2,
-    title: 'happy-llm',
-    url: 'https://github.com/datawhalechina/happy-llm/tree/main',
-    mainCategory: 'github',
-    subCategory: '经典项目',
-    description: '从零开始的大语言模型原理与实践教程',
-    rating: 5,
-    icon: faGithub
-  },
-  {
-    id: 3,
-    title: 'llm-universe',
-    url: 'https://github.com/datawhalechina/llm-universe',
-    mainCategory: 'github',
-    subCategory: '经典项目',
-    description: '动手学大模型应用开发',
-    rating: 5,
-    icon: faGithub
-  },
-  {
-    id: 4,
-    title: '潮流周刊',
-    url: 'https://weekly.tw93.fun/',
-    mainCategory: '新闻',
-    subCategory: '技术',
-    description: '每周一更新一次',
-    rating: 5,
-    icon: faGithub
-  },
-  {
-    id: 5,
-    title: 'hello-github',
-    url: 'https://hellogithub.com/',
-    mainCategory: '新闻',
-    subCategory: '技术',
-    description: 'hello-github 是一个分享 GitHub 上有趣、入门级的开源项目',
-    rating: 5,
-    icon: faGithub
-  },{
-    id: 6,
-    title: 'hello算法',
-    url: 'https://www.hello-algo.com/',
-    mainCategory: '研发',
-    subCategory: '算法',
-    description: '画图解、一键运行的数据结构与算法教程',
-    rating: 5,
-    icon: faBook
-  },{
-    id: 7,
-    title: '科技爱好者周刊',
-    url: 'https://github.com/ruanyf/weekly',
-    mainCategory: '新闻/周刊',
-    subCategory: '科技',
-    description: '记录每周值得分享的科技内容，周五发布。',
-    rating: 5,
-    icon: faBook
-  },
-  {
-    id: 8,
-    title: 'FNJ',
-    url: 'https://service.phoeniciatech.cn/new/',
-    mainCategory: '友商',
-    subCategory: '换电柜',
-    description: 'FNJ',
-    rating: 3,
-  },
-  {
-    id:9,
-    title: 'supabase',
-    url: 'https://supabase.com/',
-    mainCategory: '研发',
-    subCategory: '开发工具',
-    description: 'supabase 是一个开源的 Firebase 替代品，支持 PostgreSQL、MySQL、SQLite 和 MongoDB',
-    rating: 5,
-    icon: faGear
-  },
-  {
-    id:10,
-    title: 'feedMe',
-    url: 'https://feedme.icu/',
-    mainCategory: '新闻/周刊',
-    subCategory: '技术',
-    description: 'feedMe 是一个分享有趣、实用的github信息，linux do信息，科技咨询等等信息的平台',
-    rating: 5,
-    icon: faNewspaper
-  },
-  {
-    id:11,
-    title: 'Cap captcha',
-    url: 'https://capjs.js.org/',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: '一个网页上的机器人识别工具，用作 CAPTCHA 方案，采用 SHA-256 工作量证明算法',
-    rating: 3,
-    icon: faGithub
-  },
-  {
-    id:12,
-    title: 'Pydoll',
-    url: 'https://github.com/autoscrape-labs/pydoll',
-    mainCategory: 'github',
-    subCategory: '自动化',
-    description: '一个操作浏览器的 Python 库，通过 Chrome DevTools Protocol，实现脚本操作本机的 Chrome 浏览器。',
-    rating: 4,
-    icon: faGithub
-  },
-  {
-    id:13,
-    title: 'AI每日资讯',
-    url: 'https://justlovemaki.github.io/CloudFlare-AI-Insight-Daily/today/book/',
-    mainCategory: '新闻/周刊',
-    subCategory: '技术',
-    description: 'AI每日资讯，每日更新',
-    rating: 5,
-    icon: faNewspaper
-  },{
-    id:14,
-    title: 'Gotify',
-    url: 'https://gotify.net/',
-    mainCategory: '研发',
-    subCategory: '开发工具',
-    description: 'Gotify 是一个开源的推送通知服务，支持多种客户端',
-    rating: 5,
-    icon: faGear
-  }, {
-    id:15,
-    title: 'Gamma.app',
-    url: 'https://gamma.app/',
-    mainCategory: '研发',
-    subCategory: 'AI',
-    description: '一个由 AI 驱动的新一代内容创建工具，可以看作是"AI 时代的 PowerPoint(PPT) ,Canva,webPage 创建',
-    rating: 7,
-    icon: faFilePowerpoint
-  },{
-    id:16,
-    title: '去安卓应用开屏广告',
-    url: 'https://github.com/gkd-kit/gkd',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: '自动去除各种软件开屏广告以及自动操作的工具',
-    rating: 7,
-    icon: faGithub
-  },{
-    id:17,
-    title: 'PayQrcode',
-    url: 'https://github.com/uxiaohan/PayQrcode',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: '一个合并微信、支付宝收款码的工具',
-    rating: 7,
-    icon: faGithub
-  },{
-    id:18,
-    title: '图标库 Lucide',
-    url: 'https://lucide.dev/',
-    mainCategory: '研发',
-    subCategory: 'UI',
-    description: '需要风格统一，主题色一致，不想麻烦的选择 icon的一个图标库',
-    rating: 7,
-  },{
-    id:19,
-    title: '中国人民银行',
-    url: 'http://www.pbc.gov.cn/',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: '中国人民银行官网,查看统计数据',
-    rating: 7,
-  },{
-    id:20,
-    title: '国家统计局',
-    url: 'https://www.stats.gov.cn/sj/',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: '国家统计局官网,查看统计数据',
-    rating: 7,
-  },{
-    id:21,
-    title: '海关总署',
-    url: 'http://www.customs.gov.cn/customs/syx/index.html/',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: '国家统计局官网,查看统计数据',
-    rating: 7,
-  }
-  ,{
-    id:22,
-    title: 'YD-BMS',
-    url: 'https://www.ievcloud.com/online/login',
-    mainCategory: '友商',
-    subCategory: '换电柜',
-    description: 'YD-BMS',
-    rating: 6,
-
-  },{
-    id:23,
-    title: '草帽未来圈子',
-    url: 'https://quanzi.xiaoe-tech.com/c_68221dcd51f62_KXAivbAT5439/feed_list?app_id=apphxnsyo2v3845&product_id=',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: '小鹅通-草帽未来',
-    rating: 6,
-  },
-  {
-    id:24,
-    title: '免费奈飞观看',
-    url: 'https://www.netflixgc.com/',
-    mainCategory: '娱乐',
-    subCategory: '影视',
-    description: '免费奈飞观看',
-    rating: 6,
-  },
-  {
-    id: 25,
-    title: '国家发改委',
-    url: 'https://www.ndrc.gov.cn/',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: '国家发展和改革委员会官网，查看发展政策和宏观经济调控信息',
-    rating: 7,
-  },
-  {
-    id: 26,
-    title: '财政部',
-    url: 'http://www.mof.gov.cn/index.htm',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: '中华人民共和国财政部官网，查看财政政策和预算信息',
-    rating: 7,
-  },
-  {
-    id: 27,
-    title: 'Wind资讯',
-    url: 'https://www.wind.com.cn/',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: 'Wind金融终端，专业的金融数据和资讯服务平台',
-    rating: 6,
-  },{
-    id: 28,
-    title: '3D 图标网站',
-    url: 'https://www.thiings.co/things',
-    mainCategory: '研发',
-    subCategory: 'UI',
-    description: '3D 图标网站',
-    rating: 7,
-  },{
-    id: 29,
-    title: 'EasySpider',
-    url: 'https://github.com/NaiboWang/EasySpider',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'EasySpider 是一个基于 Python 的爬虫框架，支持多种数据源和数据格式',
-    rating: 7,
-  },{
-    id: 30,
-    title: '一些市场商用软件的AI提示词',
-    url: 'https://github.com/x1xhlol/system-prompts-and-models-of-ai-tools',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: '一些市场商用软件的AI提示词',
-    rating: 7,
-  },{
-    id: 31,
-    title: 'MCP生成图片',
-    url: 'https://github.com/mikeyny/ai-image-gen-mcp',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'MCP生成图片',
-    rating: 7,
-  },{
-    id: 32,
-    title: '中国外汇管理中心网站',
-    url: 'https://www.chinamoney.com.cn/chinese/index.html',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: '中国外汇管理中心官网，外汇、债券、LPR',
-    rating: 7,
-  },{
-    id: 33,
-    title: 'Radix UI',
-    url: 'https://www.radix-ui.com/',
-    mainCategory: '研发',
-    subCategory: '前端',
-    description: 'Radix UI 是一个开源的 UI 组件库，基于 React 和 TypeScript 构建',
-    rating: 7,
-  },{
-    id: 34,
-    title: 'Tailwind CSS',
-    url: 'https://tailwindcss.com/',
-    mainCategory: '研发',
-    subCategory: '前端',
-    description: 'Tailwind CSS 是一个开源的 CSS 框架，基于 Tailwind CSS 构建',
-    rating: 7,
-  },{
-    id: 35,
-    title: 'Motion动画',
-    url: 'https://motion.dev/',
-    mainCategory: '研发',
-    subCategory: '前端',
-    description: 'Motion 是一个开源的动画库，基于 React 和 TypeScript 构建',
-    rating: 7,
-  },{
-    id: 36,
-    title: 'remotion',
-    url: 'https://github.com/remotion-dev/remotion',
-    mainCategory: '研发',
-    subCategory: '前端',
-    description: '用react制作动态视频',
-    rating: 7,
-  },{
-    id: 37,
-    title: 'moocup',
-    url: 'https://moocup.jaydip.me/',
-    mainCategory: '研发',
-    subCategory: '前端',
-    description: 'moocup有渐变色背景，放入自己图片，进行拼接',
-    rating: 7,
-  },{
-    id: 38,
-    title: 'firecrawl',
-    url: 'https://github.com/mendableai/firecrawl',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'API工具，可将整个网站转换为适合大型语言模型的Markdown或结构化数据。它通过单一API实现网页抓取、爬取和提取功能，使用TypeScript开发',
-    rating: 7,
-  },{
-    id: 39,
-    title: 'paperless-ngx',
-    url: 'https://github.com/paperless-ngx/paperless-ngx',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: '高性能文档管理系统，支持扫描、索引和归档各类文档',
-    rating: 7,
-  },{
-    id:40,
-    title: 'OpenCut',
-    url: 'https://github.com/OpenCut-app/OpenCut',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'OpenCut 开源的视频剪辑工具',
-    rating: 7,
-  },{
-    id:41,
-    title: 'RSShub',
-    url: 'https://github.com/DIYgod/RSSHub',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'RSSHub 是一个开源的 RSS 生成器，支持多种网站',
-    rating: 7,
-  },{
-    id:42,  
-    title: 'lmarena 模型排行榜',
-    url: 'https://lmarena.ai/leaderboard',
-    mainCategory: '研发',
-    subCategory: 'AI',
-    description: 'lmarena 模型排行榜',
-    rating: 7,
-  },{
-    id:43,
-    title: 'SEAL LLM 模型排行榜',
-    url: 'https://scale.com/leaderboard',
-    mainCategory: '研发',
-    subCategory: 'AI',
-    description: 'SEAL LLM 模型排行榜',
-    rating: 7,
-  },{
-    id:44,
-    title: 'ntfy 推送',
-    url: 'https://github.com/binwiederhier/ntfy?tab=readme-ov-file',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'ntfy 推送消息到手机，电脑',
-    rating: 7,
-  },{
-    id:45,
-    title: 'nginx-proxy-manager',
-    url: 'https://github.com/NginxProxyManager/nginx-proxy-manager',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'nginx配置的可视化界面',
-    rating: 7,
-  },{
-    id:46,
-    title: '动手学习llm',
-    url: 'https://github.com/echonoshy/cgft-llm',
-    mainCategory: '研发',
-    subCategory: 'AI',
-    description: '动手学习大模型LLM',
-    rating: 7,
-  },{
-    id:47,
-    title: '终极学习研发构建自己的XXX',
-    url: 'https://github.com/codecrafters-io/build-your-own-x',
-    mainCategory: '研发',
-    subCategory: '其他',
-    description: '终极学习研发构建自己的XXX，学习各种研发知识',
-    rating: 7,
-  },{
-    id:48,
-    title: 'go 爬虫',
-    url: 'https://github.com/gocolly/colly',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'go 爬虫框架',
-    rating: 7,
-  },{
-    id:49,
-    title: 'keycheck 快捷键',
-    url: 'https://keycheck.dev/',
-    mainCategory: '研发',
-    subCategory: '其他',
-    description: '查看系统和很多APP的快捷键',
-    rating: 7,
-  },{
-    id:50,
-    title: 'FossFLOW 网络画图工具',
-    url: 'https://github.com/stan-smith/FossFLOW?tab=readme-ov-file',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'FossFLOW 网络画图工具',
-    rating: 7,
-  },{
-    id:51,
-    title: 'wr.do',
-    url: 'https://wr.do/dashboard',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: '一个自搭建的域名服务平台，可以基于域名创建子域名、短链接、邮件地址，并提供 API 接口',
-    rating: 7,
-  },{
-    id:52,
-    title: 'traffic.cv',
-    url: 'https://traffic.cv/',
-    mainCategory: '研发',
-    subCategory: '其他',
-    description: '免费的网站流量信息查询工具',
-    rating: 7,
-  },{
-    id:53,
-    title: 'genai-toolbox',
-    url: 'https://github.com/googleapis/genai-toolbox',
-    mainCategory: '研发',
-    subCategory: 'AI',
-    description: 'genai-toolbox 是一个开源的MCP服务器，操作数据库',
-  }, {
-    id:54,
-    title: '国家外汇统计局',
-    url: 'https://www.safe.gov.cn/safe/index.html',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: '国家外汇统计局',
-    rating: 7,
-  },{
-    id:55,
-    title: 'strapi',
-    url: 'https://github.com/strapi/strapi',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'strapi 是一个开源的CMS系统，可以快速搭建网站',
-    rating: 7,
-  },{
-    id: 57,
-    title: '拼图工具',
-    url: 'https://img.ops-coffee.cn/zh/#philosophy',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: '一款免费拼图工具',
-    rating: 7,
-  },{
-    id:58,
-    title: '免费Ai文字转语音',
-    url: 'https://www.ttsomni.com/zh',
-    mainCategory: '研发',
-    subCategory: 'AI',
-    description: '免费Ai文字转语音',
-    rating: 7,
-  },{
-    id:59,
-    title: '4种颜色的调色板',
-    url: 'https://www.iamsajid.com/colors/',
-    mainCategory: '研发',
-    subCategory: '开发工具',
-    description: '4种颜色的调色板',
-    rating: 7,
-  },{
-    id:60,
-    title: 'json生成图表',
-    url: 'https://jsoncrack.com/editor',
-    mainCategory: '研发',
-    subCategory: '开发工具',
-    description: '把json，csv生成图表',
-    rating: 7,
-  },{
-    id:61,
-    title: 'tcpviz',
-    url: 'https://tcpviz.com/',
-    mainCategory: '研发',
-    subCategory: '开发工具',
-    description: 'tcpviz 是一个开源的TCP网络可视化工具，可以可视化TCP网络流量,可以把PCAP协议转成可视化图表',
-    rating: 7,
-
-  },{
-    id:62,
-    title: 'arxiv论文',
-    url: 'https://arxiv.org/',
-    mainCategory: '新闻/周刊',
-    subCategory: '科技',
-    description: '开放获取（Open Access）的预印本论文仓库',
-    rating: 7,
-  },{
-    id:63,
-    title: 'Aiweb爬虫',
-    url: 'https://github.com/unclecode/crawl4ai',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'AIweb爬虫提供速度超快、AI 就绪的 Web 爬取功能，专为 LLM、AI 代理和数据管道量身定制',
-    rating: 7,
-  },{
-    id:64,
-    title: 'UI组件',
-    url: 'https://uiverse.io/elements',
-    mainCategory: '研发',
-    subCategory: '前端',
-    description: 'UI组件',
-    rating: 7,
-  },{
-    id:65,
-    title: 'ansible-ui',
-    url: 'https://github.com/sky22333/ansible-ui',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'ansible-ui 一个基于ansible的管理界面，方便小白使用',
-    rating: 7,
-  },{
-    id:66,
-    title: 'ponghub',
-    url: 'https://github.com/WCY-dt/ponghub?tab=readme-ov-file',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: '一个开源的服务监控平台，通过 GitHub Actions 去监控服务是否正常在线',
-    rating: 7,
-  },{
-    id:67,
-    title: '技能人才评价工作网',
-    url: 'https://www.osta.org.cn/index.html',
-    mainCategory: '新闻/周刊',
-    subCategory: '科技',
-    description: '技能人才职业资格证书查询',
-    rating: 7,
-  },{
-    id:68,
-    title: '中国债券信息网',
-    url: 'https://www.chinabond.com.cn/',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: '中国债券信息网，查询债券信息',
-    rating: 7,
-  },{
-    id:69,
-    title: '颜色生成器',
-    url: 'https://kigen.design/color',
-    mainCategory: '研发',
-    subCategory: '开发工具',
-    description: '颜色生成器',
-    rating: 7,
-  },{
-    id:70,
-    title: 'openstatus 状态监控',
-    url: 'https://github.com/openstatusHQ/openstatus',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'openstatus 页面和API状态监控',
-    rating: 7,
-  },{
-    id:71,
-    title: 'coddy学习编程',
-    url: 'https://coddy.tech/onboard',
-    mainCategory: '研发',
-    subCategory: '开发工具',
-    description: 'coddy学习编程',
-    rating: 7,
-  },{
-    id:72,
-    title: '天天基金网',
-    url: 'https://www.1234567.com.cn/',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: '天天基金网，查询基金信息',
-    rating: 7,
-  },{
-    id:73,
-    title: 'LiYing照片处理工具',
-    url: 'https://github.com/aoguai/LiYing',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'LiYing 是一套适用于自动化完成一般照相馆后期证件照处理流程的照片自动处理的程序。',
-    rating: 7,
-  },{
-    id:74,
-    title: 'Canary Tokens（看门狗令牌）',
-    url: 'https://canarytokens.org/nest/',
-    mainCategory: '研发',
-    subCategory: '安全',
-    description: '让你在系统、文件、文档或网站中植入“诱饵”元素，当有人触碰它们时就会触发警报，从而帮助你尽早发现潜在的入侵行为。',
-    rating: 7,
-  },{
-    id:75,
-    title: 'pixel-motion',
-    url: 'https://pixel-motion.yysuni.com/',
-    mainCategory: '研发',
-    subCategory: '开发工具',
-    description: '在线的像素图作图工具，可以同屏制作多个动画帧',
-    rating: 7,
-  },{
-    id:76,
-    title: '数学手册计算器',
-    url: 'https://drhuang.com/chinese/science/mathematics/software/',
-    mainCategory: '研发',
-    subCategory: '其他',
-    description: '一个在线数学工具，包括数学手册、计算器、数学图形绘制等功能',
-    rating: 7,
-  },{
-    id:77,
-    title: 'mkcert',
-    url: 'https://github.com/FiloSottile/mkcert',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'mkcert 是一个用于生成本地开发环境的 SSL 证书的工具',
-    rating: 7,
-  },{
-    id:78,
-    title: 'awesome-llm-apps',
-    url: 'https://github.com/Shubhamsaboo/awesome-llm-apps?tab=readme-ov-file',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'awesome-llm-apps 是一个收集了各种LLM应用的仓库',
-    rating: 7,
-  },{
-    id:79,
-    title: '东方财富网',
-    url: 'https://www.eastmoney.com/default.html',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: '东方财富网，查询股票信息，基金信息',
-    rating: 7,
-  }, {
-    id:80,
-    title: 'ai-goofish-monitor咸鱼监控',
-    url: 'https://github.com/dingyufei615/ai-goofish-monitor',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'ai-goofish-monitor 是一个咸鱼监控工具，可以监控咸鱼上的商品信息',
-    rating: 7,
-  },{
-    id:81,
-    title: 'toBeBetterJavaer 学习Java',
-    url: 'https://github.com/itwanger/toBeBetterJavaer?tab=readme-ov-file',
-    mainCategory: '研发',
-    subCategory: '后端',
-    description: 'toBeBetterJavaer 是一个学习Java的仓库，包括Java基础、Java并发、Java虚拟机、Java性能优化、Java面试题等',
-    rating: 7,
-  },{
-    id:82,
-    title: '60s-api',
-    url: 'https://docs.60s-api.viki.moe/',
-    mainCategory: '研发',
-    subCategory: '开发工具',
-    description: '60s API 是一系列 高质量、开源、可靠、全球 CDN 加速 的开放 API 集合。可以调用很多有用工具',
-    rating: 7,
-  },{
-    id:83,
-    title: '日志分析工具',
-    url: 'https://github.com/control-theory/gonzo',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: '日志分析工具，对日志进行分类总结',
-    rating: 7,
-  },{
-    id:84,
-    title: '云端串口调试工具',
-    url: 'https://serial.xywml.com/',
-    mainCategory: '研发',
-    subCategory: '开发工具',
-    description: '云端串口调试工具',
-    rating: 7,
-  },{
-    id:85,
-    title: 'deepwiki',
-    url: 'https://deepwiki.com/',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: '把任意 GitHub 仓库，变成一个 Wiki，详细解释代码运行过程，阅读代码的好帮手',
-    rating: 7,
-  },{
-    id:86,
-    title: 'linux 的网络分析工具',
-    url: 'https://github.com/pythops/oryx',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'linux 的网络分析工具',
-    rating: 7,
-  },{
-    id:87,
-    title: 'fred',
-    url: 'https://fred.stlouisfed.org',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: 'fred 是一个开源的金融数据工具，可以查询金融数据',
-    rating: 7,
-  },{
-    id:88,
-    title: 'yahoo金融',
-    url: 'https://finance.yahoo.com',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: 'yahoo金融，可以查询金融数据',
-    rating: 7,
-  },{
-    id:89,
-    title: 'tradingeconomics',
-    url: 'https://zh.tradingeconomics.com/',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: 'tradingeconomics，可以查询金融数据',
-    rating: 7,
-  },{
-    id:90,
-    title: 'tinyauth',
-    url: 'https://github.com/steveiliop56/tinyauth',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: '为任何 Web 应用或服务一键添加登录界面或 OAuth 登录（Google、GitHub 等），无需修改现有代码，可无缝集成到 Traefik、Caddy、Nginx 等主流反向代理，极大简化了安全登录的实现流程。',
-    rating: 7,
-  },{
-    id:91,
-    title: 'storymotion动画',
-    url: 'https://storymotion.video/',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'storymotion，通过excaldraw可以制作视频',
-    rating: 7,
-  },{
-    id:92,
-    title: 'malai 代理 TCP',
-    url: 'https://malai.sh/tcp/',
-    mainCategory: ' 研发',
-    subCategory: '开发工具',
-    description: '一个命令行工具，将本机的 TCP 端口分享出去。',
-    rating: 7,
-  },{
-    id:93,
-    title: '量化交易 Qbot',
-    url: 'https://github.com/UFund-Me/Qbot',
-    mainCategory: ' 研发',
-    subCategory: '其他',
-    description: '量化交易 Qbot',
-    rating: 7,
-  },{
-    id:94,
-    title: 'highlight 监控平台',
-    url: 'https://github.com/highlight/highlight?tab=readme-ov-file',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'highlight 监控平台',
-    rating: 7,
-  },{
-    id:95,
-    title: '了解你的设备指纹',
-    url: 'https://fingerprint.goldenowl.ai/',
-    mainCategory: '研发',
-    subCategory: '其他',
-    description: '了解到当前你访问一个网页可以收集到的你的哪些信息',
-    rating: 7,
-  },{
-    id:96,
-    title: 'whalewisdom',
-    url: 'https://whalewisdom.com/',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: 'whalewisdom，可以查询基金信息，持仓人信息',
-    rating: 7,
-  },{
-    id:97,
-    title: 'dataroma',
-    url: 'https://www.dataroma.com/m/home.php',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: 'dataroma查看顶级投资人持仓',
-    rating: 7,
-  },{
-    id:98,
-    title: 'WhisperLiveKit',
-    url: 'https://github.com/QuentinFuxa/WhisperLiveKit',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'WhisperLiveKit，开箱即用的声音转文字软件',
-    rating: 7,
-  },{
-    id:99,
-    title: 'mole',
-    url: 'https://github.com/tw93/mole',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'mole用来清理 MAC 垃圾',
-    rating: 7,
-  },{
-    id:100,
-    title: 'subtitleedit',
-    url: 'https://github.com/SubtitleEdit/subtitleedit',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'subtitleedit，一个视频字幕编辑器',
-    rating: 7,
-  },{
-    id:101,
-    title: 'platypus',
-    url: 'https://sveinbjorn.org/platypus',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'platypus，一个macOS应用程序打包工具,可以打包 shell 脚本，python 等等',
-    rating: 7,
-  },{
-    id:102,
-    title: 'fscan',
-    url: 'https://github.com/shadow1ng/fscan',
-    mainCategory: 'github',
-    subCategory: '开发工具',
-    description: 'fscan，一个快速扫描工具，可以扫描端口，服务，域名，子域名，等等',
-    rating: 7,
-  },{
-    id:103,
-    title: 'handy',
-    url: 'https://github.com/cjpais/Handy?tab=readme-ov-file',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: '语音转文字',
-    rating: 7,
-  },{
-    id:104,
-    title: 'xcodeReviewer',
-    url: 'https://github.com/lintsinghua/XCodeReviewer',
-    mainCategory: 'github',
-    subCategory: '工具类',
-    description: 'XCodeReviewer，使用大模型来审查代码',
-    rating: 7,
-  },{
-    id:105,
-    title: 'atomfair电池知识',
-    url: 'https://atomfair.com/battery-equipment-and-instrument/index.php',
-    mainCategory: '研发',
-    subCategory: '其他',
-    description: '包含电池相关的很多技术',
-    rating: 7,
-  },{
-    id:106,
-    title: 'bark iphone通知',
-    url: 'https://bark.day.app/#/?id=bark/',
-    mainCategory: '研发',
-    subCategory: '后端',
-    description: 'bark iphone通知，可以发送通知到iphone',
-    rating: 7,
-  },{
-    id:107,
-    title: 'ai资讯网站',
-    url: 'https://zara.faces.site/ai',
-    mainCategory: '研发',
-    subCategory: 'AI',
-    description: 'ai资讯网站',
-    rating: 7,
-  },{
-    id:108,
-    title: '预测市场，看分布',
-    url: 'https://polymarket.com/new',
-    mainCategory: '新闻/周刊',
-    subCategory: '经济',
-    description: '预测市场，看分布',
-    rating: 7,
-  },{
-    id:109,
-    title: 'codewiki.google',
-    url: 'https://codewiki.google.com/',
-    mainCategory: '研发',
-    subCategory: 'AI',
-    description: 'codewiki.google，一个谷歌的代码wiki，可以查看各种代码的实现原理',
-    rating: 7,
-  },{
-    id:110,
-    title: 'claude code template',
-    url: 'https://www.aitmpl.com/agents',
-    mainCategory: '研发',
-    subCategory: 'AI',
-    description: 'claude code template，一个claude的提示 agent',
-    rating: 7,
-  },{
-    id:111,
-    title: 'vibe code教程',
-    url: 'https://www.vibevibe.cn/Basic',
-    mainCategory: '研发',
-    subCategory: 'AI',
-    description: 'vibevibe code教程，一个vibe code的教程',
-    rating: 7,
-  }
-
-  
-
-
-
-
-]
-
-// 分类配置
-const categories = {
-  '研发': {
-    icon: faGears,
-    subCategories: ['开发工具', 'AI', 'UI','后端','前端','数据库','运维','安全','算法','其他']
-  },
-  'github': {
-    icon: faBook,
-    subCategories: ['经典项目','工具类','自动化']
-  },
-  '新闻/周刊': {
-    icon: faNewspaper,
-    subCategories: ['技术','科技', '政治', '军事','经济']
-  },
-  '娱乐': {
-    icon: faGamepad,
-    subCategories: ['游戏', '影视']
-  },
-  '友商': {
-    icon: faMoon,
-    subCategories: ['换电柜']
-  }
-}
-
-// 预设渐变主题
-const gradientPresets = [
-  {
-    id: 'sunset',
-    name: '日落',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
-    primary: '#667eea'
-  },
-  {
-    id: 'ocean',
-    name: '海洋',
-    background: 'linear-gradient(135deg, #0ea5e9 0%, #0891b2 50%, #0f766e 100%)',
-    primary: '#0891b2'
-  },
-  {
-    id: 'forest',
-    name: '森林',
-    background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)',
-    primary: '#059669'
-  },
-  {
-    id: 'fire',
-    name: '火焰',
-    background: 'linear-gradient(135deg, #f59e0b 0%, #ef4444 50%, #dc2626 100%)',
-    primary: '#ef4444'
-  },
-  {
-    id: 'purple',
-    name: '紫罗兰',
-    background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%)',
-    primary: '#7c3aed'
-  },
-  {
-    id: 'aurora',
-    name: '极光',
-    background: 'linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #ec4899 100%)',
-    primary: '#8b5cf6'
-  }
-]
-
-// 主题配置
+// 主题配置 - 只保留暗黑和白色
 const themes = {
-  light: {
-    name: '明亮',
-    icon: faSun,
-    primary: '#1a73e8',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    cardBg: 'rgba(255, 255, 255, 0.9)',
-    sidebarBg: 'rgba(255, 255, 255, 0.85)',
-    textPrimary: '#3c4043',
-    textSecondary: 'rgba(60, 64, 67, 0.8)'
-  },
   dark: {
     name: '暗黑',
-    icon: faMoon,
-    primary: '#4285f4',
-    background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
-    cardBg: 'rgba(45, 55, 72, 0.9)',
-    sidebarBg: 'rgba(45, 55, 72, 0.85)',
-    textPrimary: '#e2e8f0',
-    textSecondary: 'rgba(226, 232, 240, 0.8)'
+    icon: faMoon
   },
-  gradient: {
-    name: '渐变',
-    icon: faPalette,
-    primary: '#667eea',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
-    cardBg: 'rgba(255, 255, 255, 0.85)',
-    sidebarBg: 'rgba(255, 255, 255, 0.8)',
-    textPrimary: '#4a5568',
-    textSecondary: 'rgba(74, 85, 104, 0.8)'
+  light: {
+    name: '白色',
+    icon: faSun
   }
 }
-
-// 博客文章数据配置
-const initialBlogs = [
-  {
-    id: 1,
-    title: '美元全球经济影响机制',
-    url: '/html/美元全球经济影响机制.html',
-    description: '分析美元在全球经济体系中的影响机制和作用',
-    category: '经济分析',
-    date: '2024-01-15',
-    tags: ['经济', '美元', '全球化']
-  },{
-    id: 2,
-    title: 'Mybatis批处理与SQL预编译',
-    url: '/html/Mybatis批处理与SQL预编译.html',
-    description: '分析Mybatis批处理与SQL预编译',
-    category: '数据库',
-    date: '2025-07-11',
-    tags: ['数据库', 'Mybatis', 'SQL']
-  },{
-    id: 3,
-    title: '三大经济指标解读.html',
-    url: '/html/三大经济指标解读.html',
-    description: '三大经济指标解读',
-    category: '经济分析',
-    date: '2025-07-11',
-    tags: ['经济', '指标', '解读']
-  },{
-    id: 4,
-    title: '全球地图服务对比.html',
-    url: '/html/全球地图服务对比.html',
-    description: '全球地图服务对比',
-    category: '地图服务',
-    date: '2025-07-11',
-    tags: ['地图服务', '对比']
-  },{
-    id: 5,
-    title: '非洲支付',
-    url: '/html/非洲支付.html',
-    description: '非洲支付',
-    category: '支付',
-    date: '2025-07-11',
-    tags: ['支付', '非洲']
-  },{
-    id: 6,
-    title: '债券投资的宏观周期指南',
-    url: '/html/债券.html',
-    description: '债券投资的宏观周期指南',
-    category: '经济分析',
-    date: '2025-07-11',
-    tags: ['经济', '债券', '宏观周期']
-  },{
-    id: 7,
-    title: 'JWT 离线换电',
-    url: '/html/JWT 离线换电.html',
-    description: 'JWT 离线换电',
-    category: '经济分析',
-    date: '2025-07-11',
-    tags: [ 'JWT', '离线换电']
-  },{
-    id:8,
-    title: '换电柜软件解决方案',
-    url: '/html/换电柜软件解决方案.html',
-    description: '换电柜软件解决方案',
-    category: '经济分析',
-    date: '2025-07-11',
-    tags: ['换电柜', '软件', '解决方案']
-  },{
-    id:9,
-    title: '换电柜对接方案',
-    url: '/html/换电柜对接方案.html',
-    description: '换电柜对接方案',
-    category: '经济分析',
-    date: '2025-07-11',
-    tags: ['换电柜', '对接', '方案']
-  },{
-    id:10,
-    title: '查理芒格误判心理学',
-    url: '/html/查理芒格误判心理学.html',
-    description: '查理芒格误判心理学',
-    category: '经济分析',
-    date: '2025-07-11',
-    tags: ['查理芒格', '误判', '心理学']
-  }
-  // 可以继续在这里添加更多博客文章
-]
 
 // RSS订阅组件
 function RssFeeds({ 
@@ -1202,6 +113,12 @@ function RssFeeds({
         <div className="error-message">
           <FontAwesomeIcon icon={faSync} />
           {error}
+        </div>
+      )}
+
+      {rssFeeds.length === 0 && !loading && !error && (
+        <div className="feed-empty" style={{ padding: '24px', textAlign: 'center' }}>
+          暂无 RSS 源，请在「管理后台 → RSS」添加
         </div>
       )}
 
@@ -1344,25 +261,34 @@ function YoutubeSubs({ feeds, loading, error, lastFetch, onRefresh }) {
 }
 
 function BlogCollection() {
-  const [blogs] = useState(initialBlogs)
+  const { htmlPages, loading } = useHtmlPages()
   const [selectedCategory, setSelectedCategory] = useState('全部')
 
   // 获取所有分类
-  const categories = ['全部', ...new Set(blogs.map(blog => blog.category))]
+  const categories = ['全部', ...new Set(htmlPages.map(page => page.category).filter(Boolean))]
 
   // 过滤博客
-  const filteredBlogs = selectedCategory === '全部' 
-    ? blogs 
-    : blogs.filter(blog => blog.category === selectedCategory)
+  const filteredBlogs = selectedCategory === '全部'
+    ? htmlPages
+    : htmlPages.filter(page => page.category === selectedCategory)
 
   // 格式化日期
   const formatDate = (dateStr) => {
+    if (!dateStr) return ''
     const date = new Date(dateStr)
     return date.toLocaleDateString('zh-CN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     })
+  }
+
+  if (loading) {
+    return (
+      <div className="blog-collection">
+        <div className="loading">加载中...</div>
+      </div>
+    )
   }
 
   return (
@@ -1391,27 +317,27 @@ function BlogCollection() {
       {/* 博客列表 */}
       <div className="blog-list">
         {filteredBlogs.length > 0 ? (
-          filteredBlogs.map(blog => (
-            <div key={blog.id} className="blog-card">
+          filteredBlogs.map(page => (
+            <div key={page.id} className="blog-card">
               <div className="blog-card-header">
-                <h3 className="blog-title">{blog.title}</h3>
-                <span className="blog-date">{formatDate(blog.date)}</span>
+                <h3 className="blog-title">{page.title}</h3>
+                <span className="blog-date">{formatDate(page.created_at)}</span>
               </div>
-              
+
               <div className="blog-meta">
-                <span className="blog-category">{blog.category}</span>
+                <span className="blog-category">{page.category}</span>
                 <div className="blog-tags">
-                  {blog.tags.map((tag, index) => (
+                  {(page.tags || []).map((tag, index) => (
                     <span key={index} className="blog-tag">#{tag}</span>
                   ))}
                 </div>
               </div>
-              
-              <p className="blog-description">{blog.description}</p>
-              
+
+              <p className="blog-description">{page.description}</p>
+
               <div className="blog-actions">
-                <a 
-                  href={blog.url}
+                <a
+                  href={page.storage_path}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="blog-read-btn"
@@ -1432,91 +358,62 @@ function BlogCollection() {
 
       {/* 添加说明 */}
       <div className="blog-footer">
-        <p>💡 提示：要添加新的博客文章，请在代码中的 initialBlogs 数组里添加相应配置</p>
+        <p>💡 提示：在管理后台添加新的博客文章</p>
       </div>
     </div>
   )
 }
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
-  const [links, setLinks] = useState(initialLinks)
+  // 使用 Supabase Auth
+  const { loading: authLoading, signOut, isAuthenticated } = useAuth()
+  
+  // 使用数据库 hooks
+  const { websites, loading: websitesLoading, fetchWebsites } = useWebsites()
+  const { categories, loading: categoriesLoading } = useCategories()
+  const { htmlPages } = useHtmlPages()
+  
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedMainCategory, setSelectedMainCategory] = useState('研发')
+  const [searchType, setSearchType] = useState(SEARCH_TYPES.ALL)
+  const [selectedMainCategory, setSelectedMainCategory] = useState('')
   const [selectedSubCategory, setSelectedSubCategory] = useState('全部')
-  const [expandedCategories, setExpandedCategories] = useState(['研发'])
+  const [expandedCategories, setExpandedCategories] = useState([])
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
-  const [currentTheme, setCurrentTheme] = useState('light')
-  const [showGradientPicker, setShowGradientPicker] = useState(false)
-  const [currentGradient, setCurrentGradient] = useState(gradientPresets[0])
+  const [currentTheme, setCurrentTheme] = useState('dark')
   const [activeMenu, setActiveMenu] = useState('blog') // 初始默认博客页面，登录检查后会自动切换
+  const [showAdminPanel, setShowAdminPanel] = useState(false)
   
-  // 登出处理
-  const handleLogout = () => {
-    localStorage.removeItem('isLoggedIn')
-    localStorage.removeItem('loginExpireTime')
-    localStorage.removeItem('username')
-    setIsLoggedIn(false)
-  }
-
-  // 登录成功处理
-  const handleLoginSuccess = () => {
-    setIsLoggedIn(true)
-    // 登录成功后跳转到主页
-    setActiveMenu('main')
-  }
-
-  // 检查登录状态
+  // 初始化默认分类
   useEffect(() => {
-    const checkAuth = () => {
-      // 如果访问的是 /html/ 目录下的文件，允许直接访问，不需要登录
-      const currentPath = window.location.pathname
-      if (currentPath.startsWith('/html/')) {
-        setIsLoggedIn(true)
-        setIsCheckingAuth(false)
-        return
-      }
-      
-      const loggedIn = localStorage.getItem('isLoggedIn')
-      const expireTime = localStorage.getItem('loginExpireTime')
-      
-      if (loggedIn === 'true' && expireTime) {
-        const now = new Date().getTime()
-        if (now < parseInt(expireTime)) {
-          setIsLoggedIn(true)
-          // 如果已登录，跳转到主页
-          setActiveMenu('main')
-        } else {
-          // 登录已过期
-          handleLogout()
-          setActiveMenu('blog') // 未登录显示博客页
-        }
+    if (categories.length > 0 && !selectedMainCategory) {
+      setSelectedMainCategory(categories[0].name)
+      setExpandedCategories([categories[0].name])
+    }
+  }, [categories, selectedMainCategory])
+  
+  // 登出处理 - 使用 Supabase Auth
+  const handleLogout = async () => {
+    await signOut()
+  }
+
+  // 当认证状态变化时更新菜单
+  useEffect(() => {
+    if (!authLoading) {
+      if (isAuthenticated) {
+        setActiveMenu('main')
       } else {
-        // 未登录，保持在博客页
         setActiveMenu('blog')
       }
-      setIsCheckingAuth(false)
-      
-      // 调试信息
-      console.log('Auth check complete:', {
-        isLoggedIn: loggedIn === 'true',
-        activeMenu: loggedIn === 'true' ? 'main' : 'blog',
-        currentPath
-      })
     }
-    
-    checkAuth()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isAuthenticated, authLoading])
 
   // 检查是否可以访问当前菜单（博客相关功能允许未登录访问）
   const canAccessMenu = (menu) => {
     if (menu === 'blog') {
       return true // 博客功能允许未登录访问
     }
-    return isLoggedIn // 其他功能需要登录
+    return isAuthenticated // 其他功能需要登录
   }
 
   // 获取YouTube数据
@@ -1532,45 +429,15 @@ function App() {
     refreshSingleFeed 
   } = useRssManager()
   
-  // 使用全局搜索
-  const searchResults = useGlobalSearch(searchTerm, links, initialBlogs, youtubeFeeds)
+  // 使用按表搜索
+  const searchResults = useGlobalSearch(searchTerm, websites, htmlPages, youtubeFeeds, searchType)
 
   // 初始化和更新主题
+// 主题切换效果
   useEffect(() => {
-    const appContainer = document.querySelector('.app-container')
-    const body = document.body
-    const root = document.documentElement
-    
-    if (currentTheme === 'gradient') {
-      // 应用渐变主题
-      const background = currentGradient.background
-      const primary = currentGradient.primary
-      
-      // 多层次应用样式确保生效
-      if (appContainer) {
-        appContainer.style.setProperty('--background', background, 'important')
-        appContainer.style.setProperty('--primary-color', primary, 'important')
-        appContainer.style.background = background
-      }
-      if (body) {
-        body.style.background = background
-      }
-      root.style.setProperty('--background', background, 'important')
-      root.style.setProperty('--primary-color', primary, 'important')
-    } else {
-      // 清除渐变主题的动态样式，回到CSS定义的主题
-      if (appContainer) {
-        appContainer.style.removeProperty('--background')
-        appContainer.style.removeProperty('--primary-color')
-        appContainer.style.removeProperty('background')
-      }
-      if (body) {
-        body.style.removeProperty('background')
-      }
-      root.style.removeProperty('--background')
-      root.style.removeProperty('--primary-color')
-    }
-  }, [currentTheme, currentGradient])
+    document.documentElement.setAttribute('data-theme', currentTheme)
+    document.body.setAttribute('data-theme', currentTheme)
+  }, [currentTheme])
 
   // 切回main时，若分类为null，自动设为默认
   useEffect(() => {
@@ -1596,17 +463,16 @@ function App() {
     setIsMobileMenuOpen(false)
   }
 
-  // 普通分类筛选（当没有搜索词时使用）
-  const filteredLinks = links.filter(link => {
-    const matchesMainCategory = selectedMainCategory === '全部' || link.mainCategory === selectedMainCategory
-    const matchesSubCategory = selectedSubCategory === '全部' || link.subCategory === selectedSubCategory
+// 普通分类筛选（当没有搜索词时使用）
+  const filteredLinks = websites.filter(site => {
+    const matchesMainCategory = selectedMainCategory === '全部' || site.main_category === selectedMainCategory
+    const matchesSubCategory = selectedSubCategory === '全部' || site.sub_category === selectedSubCategory
     return matchesMainCategory && matchesSubCategory
   })
 
-  const updateRating = (id, newRating) => {
-    setLinks(links.map(link => 
-      link.id === id ? { ...link, rating: newRating } : link
-    ))
+  const updateRating = async (id, newRating) => {
+    // 评分更新功能 - 后续可以实现
+    console.log('Rating update:', id, newRating)
   }
 
   const handleCategorySelect = (mainCategory, subCategory) => {
@@ -1635,54 +501,8 @@ function App() {
     }
   }
 
-  const handleThemeChange = (theme) => {
+const handleThemeChange = (theme) => {
     setCurrentTheme(theme)
-    if (theme === 'gradient') {
-      setShowGradientPicker(true)
-    } else {
-      setShowGradientPicker(false)
-      // 清除内联样式，让CSS类生效
-      const root = document.documentElement
-      const properties = [
-        '--background', '--primary-color', '--card-bg', '--sidebar-bg',
-        '--text-primary', '--text-secondary', '--text-white', '--border-color', '--input-border'
-      ]
-      properties.forEach(prop => {
-        root.style.removeProperty(prop)
-      })
-    }
-  }
-
-  const handleGradientSelect = (gradient) => {
-    setCurrentGradient(gradient)
-    setShowGradientPicker(false)
-    
-    // 确保当前主题是渐变模式
-    if (currentTheme !== 'gradient') {
-      setCurrentTheme('gradient')
-    }
-    
-    // 延迟一帧执行，确保组件已更新
-    setTimeout(() => {
-      const appContainer = document.querySelector('.app-container')
-      const body = document.body
-      const root = document.documentElement
-      
-      const background = gradient.background
-      const primary = gradient.primary
-      
-      // 多层次应用样式确保生效
-      if (appContainer) {
-        appContainer.style.setProperty('--background', background, 'important')
-        appContainer.style.setProperty('--primary-color', primary, 'important')
-        appContainer.style.background = background
-      }
-      if (body) {
-        body.style.background = background
-      }
-      root.style.setProperty('--background', background, 'important')
-      root.style.setProperty('--primary-color', primary, 'important')
-    }, 0)
   }
 
   // 渲染星级评分组件
@@ -1704,7 +524,7 @@ function App() {
   }
 
   // 如果正在检查登录状态，显示加载
-  if (isCheckingAuth) {
+  if (authLoading) {
     return (
       <div className="loading-screen">
         <div className="loading-spinner"></div>
@@ -1714,8 +534,8 @@ function App() {
 
   // 如果未登录且尝试访问需要登录的功能，显示登录页面
   // 博客功能（blog）允许未登录访问
-  if (!isLoggedIn && (activeMenu === 'login-required' || !canAccessMenu(activeMenu))) {
-    return <Login onLoginSuccess={handleLoginSuccess} />
+  if (!isAuthenticated && (activeMenu === 'login-required' || !canAccessMenu(activeMenu))) {
+    return <Login />
   }
 
   return (
@@ -1731,55 +551,32 @@ function App() {
         onClick={closeMobileMenu}
       ></div>
 
-      {/* 渐变选择器弹窗 */}
-      {showGradientPicker && (
-        <div className="gradient-picker-overlay" onClick={() => setShowGradientPicker(false)}>
-          <div className="gradient-picker" onClick={(e) => e.stopPropagation()}>
-            <div className="gradient-picker-header">
-              <h3>选择渐变主题</h3>
-              <button 
-                className="close-btn"
-                onClick={() => setShowGradientPicker(false)}
-              >
-                <FontAwesomeIcon icon={faTimes} />
-              </button>
-            </div>
-            <div className="gradient-grid">
-              {gradientPresets.map(gradient => (
-                <div
-                  key={gradient.id}
-                  className={`gradient-option ${currentGradient.id === gradient.id ? 'selected' : ''}`}
-                  style={{ background: gradient.background }}
-                  onClick={() => handleGradientSelect(gradient)}
-                >
-                  <div className="gradient-name">{gradient.name}</div>
-                  {currentGradient.id === gradient.id && (
-                    <div className="gradient-check">
-                      <FontAwesomeIcon icon={faCheck} />
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       <aside className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-header">
           <h2>Eclair Collection</h2>
           <p>LIVE</p>
-          {isLoggedIn && (
-            <button 
-              className="logout-btn"
-              onClick={handleLogout}
-              title="退出登录"
-            >
-              <FontAwesomeIcon icon={faSignOutAlt} />
-              退出登录
-            </button>
+          {isAuthenticated && (
+            <>
+              <button 
+                className="special-menu-btn admin"
+                onClick={() => setShowAdminPanel(true)}
+                title="管理后台"
+              >
+                <FontAwesomeIcon icon={faGears} />
+                管理后台
+              </button>
+              <button 
+                className="logout-btn"
+                onClick={handleLogout}
+                title="退出登录"
+              >
+                <FontAwesomeIcon icon={faSignOutAlt} />
+                退出登录
+              </button>
+            </>
           )}
-          {!isLoggedIn && (
+          {!isAuthenticated && (
             <>
               <div className="login-prompt">
                 <p>登录以解锁更多功能</p>
@@ -1797,7 +594,7 @@ function App() {
           )}
         </div>
         
-        {isLoggedIn && (
+        {isAuthenticated && (
           <div className="search-bar">
             <FontAwesomeIcon icon={faSearch} />
             <input
@@ -1809,7 +606,7 @@ function App() {
           </div>
         )}
 
-        {isLoggedIn && (
+        {isAuthenticated && (
           <>
             {/* 主题切换按钮 */}
             <div className="theme-toggle">
@@ -1862,8 +659,8 @@ function App() {
                 setActiveMenu('login-required')
               }
             }}
-            disabled={!isLoggedIn}
-            title={!isLoggedIn ? '需要登录' : ''}
+            disabled={!isAuthenticated}
+            title={!isAuthenticated ? '需要登录' : ''}
           >
             <FontAwesomeIcon icon={faYoutube} />
             youtubo订阅
@@ -1878,8 +675,8 @@ function App() {
                 setActiveMenu('login-required')
               }
             }}
-            disabled={!isLoggedIn}
-            title={!isLoggedIn ? '需要登录' : ''}
+            disabled={!isAuthenticated}
+            title={!isAuthenticated ? '需要登录' : ''}
           >
             <FontAwesomeIcon icon={faRss} />
             RSS订阅
@@ -1894,35 +691,35 @@ function App() {
           </button>
         </div>
         
-        {isLoggedIn && (
+{isAuthenticated && (
           <nav className="category-nav">
-            {Object.entries(categories).map(([category, { icon, subCategories }]) => (
-              <div key={category} className="category-group">
-                <div 
+            {categories.map(cat => (
+              <div key={cat.id} className="category-group">
+                <div
                   className="main-category"
-                  data-expanded={expandedCategories.includes(category)}
-                  onClick={() => toggleCategory(category)}
+                  data-expanded={expandedCategories.includes(cat.name)}
+                  onClick={() => toggleCategory(cat.name)}
                 >
-                  <FontAwesomeIcon icon={icon} />
-                  <span>{category}</span>
-                  <FontAwesomeIcon 
-                    icon={expandedCategories.includes(category) ? faChevronDown : faChevronRight} 
+                  <FontAwesomeIcon icon={faFolder} />
+                  <span>{cat.name}</span>
+                  <FontAwesomeIcon
+                    icon={expandedCategories.includes(cat.name) ? faChevronDown : faChevronRight}
                     className="expand-icon"
                   />
                 </div>
-                {expandedCategories.includes(category) && (
+                {expandedCategories.includes(cat.name) && (
                   <div className="sub-categories">
                     <button
-                      className={`sub-category ${activeMenu === 'main' && selectedMainCategory === category && selectedSubCategory === '全部' ? 'active' : ''}`}
-                      onClick={() => handleCategorySelect(category, '全部')}
+                      className={`sub-category ${activeMenu === 'main' && selectedMainCategory === cat.name && selectedSubCategory === '全部' ? 'active' : ''}`}
+                      onClick={() => handleCategorySelect(cat.name, '全部')}
                     >
                       全部
                     </button>
-                    {subCategories.map(subCategory => (
+                    {(cat.sub_categories || []).map(subCategory => (
                       <button
                         key={subCategory}
-                        className={`sub-category ${activeMenu === 'main' && selectedMainCategory === category && selectedSubCategory === subCategory ? 'active' : ''}`}
-                        onClick={() => handleCategorySelect(category, subCategory)}
+                        className={`sub-category ${activeMenu === 'main' && selectedMainCategory === cat.name && selectedSubCategory === subCategory ? 'active' : ''}`}
+                        onClick={() => handleCategorySelect(cat.name, subCategory)}
                       >
                         {subCategory}
                       </button>
@@ -1938,10 +735,12 @@ function App() {
       <main className="main-content">
 
         
-        {activeMenu === 'search' && (
-          <SearchResults 
+{activeMenu === 'search' && (
+          <SearchResults
             searchResults={searchResults}
             searchTerm={searchTerm}
+            searchType={searchType}
+            onSearchTypeChange={setSearchType}
             onItemClick={handleSearchItemClick}
           />
         )}
@@ -1950,9 +749,9 @@ function App() {
           <>
             <div className="content-header">
               <h1>
-                {selectedMainCategory !== '全部' && (
+                {selectedMainCategory && (
                   <>
-                    <FontAwesomeIcon icon={categories[selectedMainCategory].icon} />
+                    <FontAwesomeIcon icon={faGears} />
                     {selectedMainCategory}
                   </>
                 )}
@@ -1961,23 +760,25 @@ function App() {
             </div>
 
             <div className={`links-container ${viewMode}`}>
-              {filteredLinks.length > 0 ? (
-                filteredLinks.map(link => (
-                  <div key={link.id} className="link-card">
+              {websitesLoading ? (
+                <div className="loading">加载中...</div>
+              ) : filteredLinks.length > 0 ? (
+                filteredLinks.map(site => (
+                  <div key={site.id} className="link-card">
                     <div className="link-header">
                       <div className="link-title">
-                        <FontAwesomeIcon icon={link.icon} className="link-icon" />
-                        <h3>{link.title}</h3>
+                        <FontAwesomeIcon icon={faGlobe} className="link-icon" />
+                        <h3>{site.title}</h3>
                       </div>
-                      {renderStarRating(link.id, link.rating)}
+                      {renderStarRating(site.id, site.rating)}
                     </div>
                     <div className="link-tags">
-                      <span className="category-tag">{link.mainCategory}</span>
-                      <span className="category-tag">{link.subCategory}</span>
-                      <span className="rating-badge">{link.rating}⭐</span>
+                      <span className="category-tag">{site.main_category}</span>
+                      <span className="category-tag">{site.sub_category}</span>
+                      <span className="rating-badge">{site.rating || 5}⭐</span>
                     </div>
-                    <p className="description">{link.description}</p>
-                    <a href={link.url} target="_blank" rel="noopener noreferrer">
+                    <p className="description">{site.description}</p>
+                    <a href={site.url} target="_blank" rel="noopener noreferrer">
                       访问网站
                     </a>
                   </div>
@@ -2013,12 +814,18 @@ function App() {
           <BlogCollection />
         )}
         {/* 未登录用户提示 */}
-        {!isLoggedIn && activeMenu === 'blog' && (
+        {!isAuthenticated && activeMenu === 'blog' && (
           <div className="guest-notice">
             <p>💡 当前以访客模式浏览博客，<button onClick={() => setActiveMenu('login-required')} className="inline-login-link">登录</button>以解锁更多功能</p>
           </div>
         )}
       </main>
+
+      {/* 管理后台面板 */}
+      <AdminPanel 
+        isOpen={showAdminPanel} 
+        onClose={() => setShowAdminPanel(false)} 
+      />
     </div>
   )
 }
