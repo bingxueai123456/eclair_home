@@ -292,6 +292,7 @@ function BlogCollection() {
     setViewingPage(page)
     setLoadingContent(true)
     setHtmlContent('')
+    setIsFullscreen(true) // 默认全屏显示
     
     try {
       const { content, error } = await getHtmlContent(page.storage_path)
@@ -399,19 +400,12 @@ function BlogCollection() {
       {viewingPage && (
         <div className="blog-viewer-overlay" onClick={closeViewer}>
           <div 
-            className={`blog-viewer-modal ${isFullscreen ? 'fullscreen' : ''}`} 
+            className="blog-viewer-modal" 
             onClick={e => e.stopPropagation()}
           >
             <div className="blog-viewer-header">
               <h2>{viewingPage.title}</h2>
               <div className="blog-viewer-controls">
-                <button 
-                  className="blog-viewer-fullscreen" 
-                  onClick={toggleFullscreen}
-                  title={isFullscreen ? '退出全屏' : '全屏'}
-                >
-                  <FontAwesomeIcon icon={isFullscreen ? faTimes : faGrip} />
-                </button>
                 <button className="blog-viewer-close" onClick={closeViewer}>
                   <FontAwesomeIcon icon={faTimes} />
                 </button>

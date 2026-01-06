@@ -237,9 +237,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-  padding: 20px;
+  z-index: 2000;
+  padding: 0;
   animation: fadeIn 0.2s ease;
+}
+
+/* 当博客查看器打开时，隐藏侧边栏和移动端菜单按钮 */
+body:has(.blog-viewer-overlay) .sidebar,
+body:has(.blog-viewer-overlay) .mobile-menu-btn {
+  display: none !important;
 }
 
 @keyframes fadeIn {
@@ -250,18 +256,14 @@
 .blog-viewer-modal {
   background: var(--galaxy-bg-card);
   border: 1px solid var(--galaxy-border);
-  border-radius: 16px;
-  width: 90%;
-  max-width: 1400px;
-  height: 85vh;
-  min-width: 400px;
-  min-height: 300px;
+  border-radius: 0;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
   animation: slideUp 0.3s ease;
-  resize: both;
   position: relative;
 }
 
