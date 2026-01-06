@@ -485,7 +485,7 @@ function WebsiteManager() {
 
 // HTML文章管理组件
 function HtmlManager() {
-  const { htmlPages, loading, fetchHtmlPages, addHtmlPage, updateHtmlPage, deleteHtmlPage, uploadHtmlFile } = useHtmlPages()
+  const { htmlPages, loading, fetchHtmlPages, addHtmlPage, updateHtmlPage, deleteHtmlPage } = useHtmlPages()
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
   const [formData, setFormData] = useState({
@@ -510,17 +510,11 @@ function HtmlManager() {
     }
 
     if (editingId) {
-      // 更新文章
-      if (htmlContent) {
-        await uploadHtmlFile(editingId, htmlContent)
-      }
-      await updateHtmlPage(editingId, pageData)
+      // 更新文章 - 如果有新的 HTML 内容，一起更新
+      await updateHtmlPage(editingId, pageData, htmlContent || null)
     } else {
-      // 新建文章
-      const result = await addHtmlPage(pageData)
-      if (result.data && htmlContent) {
-        await uploadHtmlFile(result.data.id, htmlContent)
-      }
+      // 新建文章 - 传递 pageData 和 htmlContent
+      await addHtmlPage(pageData, htmlContent)
     }
     
     resetForm()

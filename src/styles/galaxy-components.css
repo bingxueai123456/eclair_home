@@ -225,6 +225,214 @@
   font-size: 13px;
 }
 
+/* ========== 博客文章查看器弹窗 ========== */
+.blog-viewer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.blog-viewer-modal {
+  background: var(--galaxy-bg-card);
+  border: 1px solid var(--galaxy-border);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 1400px;
+  height: 85vh;
+  min-width: 400px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.3s ease;
+  resize: both;
+  position: relative;
+}
+
+/* 全屏模式 */
+.blog-viewer-modal.fullscreen {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  border-radius: 0;
+  resize: none;
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.blog-viewer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--galaxy-border);
+  background: rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+}
+
+.blog-viewer-header h2 {
+  color: var(--galaxy-text-primary);
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 16px;
+}
+
+.blog-viewer-controls {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.blog-viewer-fullscreen,
+.blog-viewer-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  border: 1px solid;
+}
+
+.blog-viewer-fullscreen {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
+}
+
+.blog-viewer-fullscreen:hover {
+  background: rgba(59, 130, 246, 0.3);
+  transform: scale(1.05);
+}
+
+.blog-viewer-close {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.blog-viewer-close:hover {
+  background: rgba(239, 68, 68, 0.3);
+  transform: scale(1.05);
+}
+
+.blog-viewer-content {
+  flex: 1;
+  overflow: hidden;
+  background: #ffffff;
+  position: relative;
+}
+
+.blog-viewer-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* 加载状态 */
+.blog-viewer-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: #ffffff;
+  color: #666;
+}
+
+.blog-viewer-loading .loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #3b82f6;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.blog-viewer-loading p {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* 调整大小手柄提示 */
+.blog-viewer-modal::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  cursor: nwse-resize;
+  background: linear-gradient(135deg, transparent 50%, rgba(255,255,255,0.1) 50%);
+  border-bottom-right-radius: 16px;
+}
+
+.blog-viewer-modal.fullscreen::after {
+  display: none;
+}
+
+/* 白色主题 */
+[data-theme="light"] .blog-viewer-modal,
+.theme-light .blog-viewer-modal {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .blog-viewer-header,
+.theme-light .blog-viewer-header {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .blog-viewer-header h2,
+.theme-light .blog-viewer-header h2 {
+  color: #1e293b;
+}
+
+[data-theme="light"] .blog-viewer-modal::after,
+.theme-light .blog-viewer-modal::after {
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.1) 50%);
+}
+
 /* ========== YouTube 订阅 ========== */
 .youtube-subs-section {
   background: var(--galaxy-bg-card);

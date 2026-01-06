@@ -261,8 +261,12 @@ function YoutubeSubs({ feeds, loading, error, lastFetch, onRefresh }) {
 }
 
 function BlogCollection() {
-  const { htmlPages, loading } = useHtmlPages()
+  const { htmlPages, loading, getHtmlContent } = useHtmlPages()
   const [selectedCategory, setSelectedCategory] = useState('全部')
+  const [viewingPage, setViewingPage] = useState(null) // 当前查看的页面
+  const [htmlContent, setHtmlContent] = useState('') // HTML 内容
+  const [loadingContent, setLoadingContent] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
 
   // 获取所有分类
   const categories = ['全部', ...new Set(htmlPages.map(page => page.category).filter(Boolean))]
@@ -281,6 +285,38 @@ function BlogCollection() {
       month: 'long',
       day: 'numeric'
     })
+  }
+
+  // 打开文章查看器 - 异步获取 HTML 内容
+  const openViewer = async (page) => {
+    setViewingPage(page)
+    setLoadingContent(true)
+    setHtmlContent('')
+    
+    try {
+      const { content, error } = await getHtmlContent(page.storage_path)
+      if (error) {
+        setHtmlContent(`<html><body><h1>加载失败</h1><p>${error.message}</p></body></html>`)
+      } else {
+        setHtmlContent(content)
+      }
+    } catch (err) {
+      setHtmlContent(`<html><body><h1>加载失败</h1><p>${err.message}</p></body></html>`)
+    } finally {
+      setLoadingContent(false)
+    }
+  }
+
+  // 关闭查看器
+  const closeViewer = () => {
+    setViewingPage(null)
+    setHtmlContent('')
+    setIsFullscreen(false)
+  }
+
+  // 切换全屏
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen)
   }
 
   if (loading) {
@@ -336,15 +372,13 @@ function BlogCollection() {
               <p className="blog-description">{page.description}</p>
 
               <div className="blog-actions">
-                <a
-                  href={page.storage_path}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
                   className="blog-read-btn"
+                  onClick={() => openViewer(page)}
                 >
                   <FontAwesomeIcon icon={faFileText} />
                   阅读文章
-                </a>
+                </button>
               </div>
             </div>
           ))
@@ -360,6 +394,47 @@ function BlogCollection() {
       <div className="blog-footer">
         <p>💡 提示：在管理后台添加新的博客文章</p>
       </div>
+
+      {/* HTML 文章查看器弹窗 */}
+      {viewingPage && (
+        <div className="blog-viewer-overlay" onClick={closeViewer}>
+          <div 
+            className={`blog-viewer-modal ${isFullscreen ? 'fullscreen' : ''}`} 
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="blog-viewer-header">
+              <h2>{viewingPage.title}</h2>
+              <div className="blog-viewer-controls">
+                <button 
+                  className="blog-viewer-fullscreen" 
+                  onClick={toggleFullscreen}
+                  title={isFullscreen ? '退出全屏' : '全屏'}
+                >
+                  <FontAwesomeIcon icon={isFullscreen ? faTimes : faGrip} />
+                </button>
+                <button className="blog-viewer-close" onClick={closeViewer}>
+                  <FontAwesomeIcon icon={faTimes} />
+                </button>
+              </div>
+            </div>
+            <div className="blog-viewer-content">
+              {loadingContent ? (
+                <div className="blog-viewer-loading">
+                  <div className="loading-spinner"></div>
+                  <p>加载中...</p>
+                </div>
+              ) : (
+                <iframe
+                  srcDoc={htmlContent}
+                  title={viewingPage.title}
+                  className="blog-viewer-iframe"
+                  sandbox="allow-scripts allow-same-origin"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -358,7 +358,7 @@ export function useHtmlPages() {
   const [error, setError] = useState(null)
 
   const fetchPages = useCallback(async (filters = {}) => {
-    if (!user) return
+    // 移除 user 检查，允许未登录用户查看博客列表
     setLoading(true)
     try {
       let query = supabase
@@ -381,7 +381,7 @@ export function useHtmlPages() {
     } finally {
       setLoading(false)
     }
-  }, [user])
+  }, [])
 
   useEffect(() => {
     fetchPages()
